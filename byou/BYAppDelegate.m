@@ -14,11 +14,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+//    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    BYRootViewController* rootView = [[BYRootViewController alloc] init];
-    self.window.rootViewController = rootView;
-    [self.window makeKeyAndVisible];
+//    BYRootViewController* rootView = [[BYRootViewController alloc] init];
+//    self.window.rootViewController = rootView;
+//    [self.window makeKeyAndVisible];
     return YES;
 }
 

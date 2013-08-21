@@ -13,11 +13,13 @@
 
 @protocol BYProductFactoryDelegate
 
--(void)parserDidFinish:(BYProductFactory*)sender;
+-(void)loginDidFinish:(BYProductFactory*)sender;
 
 @end
 
 @interface BYProductFactory : NSObject <NSURLConnectionDataDelegate, NSURLConnectionDelegate, NSXMLParserDelegate>
+
+-(void)authLoginName:(NSString*)usr withPass:(NSString*)pass;
 
 -(void)registerProduct:(BYProduct*)product withIdentifier:(NSString*)identifier;
 -(int)dividePieces:(int)Value forCollection:(int)collection andPos:(int)pos;
@@ -29,5 +31,8 @@
 
 @property (nonatomic, strong) NSMutableDictionary* Products;
 @property (nonatomic, weak) id <BYProductFactoryDelegate> delegate;
+
+@property (nonatomic, strong) NSString* loginMessage;
+@property (nonatomic, strong) UIColor* loginMessageColor;
 
 @end

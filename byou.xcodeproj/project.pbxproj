@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */; };
+		DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */; };
 		DBD33D9417B7C4AF0081B999 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9317B7C4AF0081B999 /* UIKit.framework */; };
 		DBD33D9617B7C4AF0081B999 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9517B7C4AF0081B999 /* Foundation.framework */; };
 		DBD33D9817B7C4AF0081B999 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9717B7C4AF0081B999 /* CoreGraphics.framework */; };
@@ -24,6 +26,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = iPadStoryBoard.storyboard; sourceTree = "<group>"; };
+		DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BYCellPrototypeLogin.h; path = ../BYCellPrototypeLogin.h; sourceTree = "<group>"; };
+		DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BYCellPrototypeLogin.m; path = ../BYCellPrototypeLogin.m; sourceTree = "<group>"; };
 		DBD33D9017B7C4AF0081B999 /* byou.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = byou.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD33D9317B7C4AF0081B999 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DBD33D9517B7C4AF0081B999 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -95,6 +100,7 @@
 			children = (
 				DBD33DA217B7C4AF0081B999 /* BYAppDelegate.h */,
 				DBD33DA317B7C4AF0081B999 /* BYAppDelegate.m */,
+				DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */,
 				DBD33DB017B7D0140081B999 /* BYProductFactory.h */,
 				DBD33DB117B7D0140081B999 /* BYProductFactory.m */,
 				DBD33DB317B7D1440081B999 /* BYProduct.h */,
@@ -105,6 +111,8 @@
 				DBD33DBA17B7EB7C0081B999 /* BYProductImagesScrollView.m */,
 				DBD33DBC17B7FDB80081B999 /* BYBasketView.h */,
 				DBD33DBD17B7FDB80081B999 /* BYBasketView.m */,
+				DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */,
+				DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */,
 				DBD33D9A17B7C4AF0081B999 /* Supporting Files */,
 			);
 			path = byou;
@@ -180,6 +188,7 @@
 				DBD33DA617B7C4AF0081B999 /* Default.png in Resources */,
 				DBD33DA817B7C4AF0081B999 /* Default@2x.png in Resources */,
 				DBD33DAA17B7C4AF0081B999 /* Default-568h@2x.png in Resources */,
+				DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +206,7 @@
 				DBD33DB817B7E9600081B999 /* BYRootViewController.m in Sources */,
 				DBD33DBB17B7EB7C0081B999 /* BYProductImagesScrollView.m in Sources */,
 				DBD33DBE17B7FDB80081B999 /* BYBasketView.m in Sources */,
+				DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +323,7 @@
 				DBD33DAF17B7C4AF0081B999 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

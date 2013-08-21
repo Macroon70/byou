@@ -6,23 +6,37 @@
 //  Copyright (c) 2013 LianDesign. All rights reserved.
 //
 
-NSString*(^createKey)(int,int) = ^(int collection,int pos) {
-    return [NSString stringWithFormat:@"collection%dposition%d",collection,pos];
+NSString*(^createKey)(NSString*,NSString*) = ^(NSString* collection,NSString* subCol) {
+    return [NSString stringWithFormat:@"%@ - %@",collection,subCol];
 };
 
-#define REQUEST_URL @"http://w0rkz.exceex.hu/byouWarehouse/imgs.php"
+NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
+    return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d}", menuId, colorId];
+};
+
+//#define REQUEST_URL @"http://w0rkz.exceex.hu/byouWarehouse/imgs.php"
+#define REQUEST_URL @"http://w0rkz.exceex.hu/byouWarehouse/"
 
 #import "BYProductFactory.h"
 
 @implementation BYProductFactory {
     NSMutableData* receivedData;
     NSMutableString* imagesBaseHref;
+    NSString* usrName;
     int actualCollection;
     int actualImage;
 }
 
 @synthesize Products;
 @synthesize delegate;
+@synthesize loginMessage;
+@synthesize loginMessageColor;
+
+-(id)init {
+    if (self = [super init]) {
+    }
+    return self;
+}
 
 -(id)initWithURL:(NSString *)initURL {
     if (self == [super init]) {
@@ -121,6 +135,36 @@ NSString*(^createKey)(int,int) = ^(int collection,int pos) {
     return self;
 }
 
+-(void)authLoginName:(NSString *)usr withPass:(NSString *)pass {
+    usrName = usr;
+    self.loginMessage = @"";
+    if ([pass length] == 0) pass = @"__empty";
+    NSLog(@"%@",pass);
+    NSURL *initURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@auth.php",REQUEST_URL]];
+    NSString *post =[NSString stringWithFormat:@"pwd=%@",pass];
+
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init] ;
+    [request setURL:initURL];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
+    
+    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+
+    if (connection) {
+        receivedData = [NSMutableData data];
+        imagesBaseHref = [NSMutableString string];
+        actualCollection = 1;
+        actualImage = 1;
+        self.Products = [NSMutableDictionary dictionary];
+    }
+}
+
+
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSLog(@"Error: %@", error);
 }
@@ -145,9 +189,31 @@ NSString*(^createKey)(int,int) = ^(int collection,int pos) {
 }
 
 -(void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
+    NSLog(@"%@",elementName);
+    if ([elementName isEqualToString:@"result"]) {
+        if ([[attributeDict objectForKey:@"status"] isEqualToString:@"no"]) {
+            self.loginMessage = @"Hibás felhasználónév vagy jelszó!";
+            self.loginMessageColor = [UIColor redColor];
+            [parser abortParsing];
+            [self.delegate loginDidFinish:self];
+        } else if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
+            self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", usrName];
+            self.loginMessageColor = [UIColor blackColor];
+        }
+    }
     if ([elementName isEqualToString:@"GALLERY"]) {
         imagesBaseHref = [attributeDict objectForKey:@"LOC"];
+        NSLog(@"Gallery : %@",attributeDict);
     }
+    if ([elementName isEqualToString:@"CATEGORY"]) {
+        imagesBaseHref = [attributeDict objectForKey:@"LOC"];
+        NSLog(@"Category : %@",attributeDict);
+    }
+    if ([elementName isEqualToString:@"IMAGE"]) {
+        imagesBaseHref = [attributeDict objectForKey:@"LOC"];
+        NSLog(@"Image : %@",attributeDict);
+    }
+    
     if ([elementName isEqualToString:@"IMAGE"]) {
         BYProduct* tempProduct = [[BYProduct alloc] init];
         tempProduct.pieces = [[attributeDict objectForKey:@"DB"] intValue];
@@ -160,7 +226,7 @@ NSString*(^createKey)(int,int) = ^(int collection,int pos) {
 
 -(void)parserDidEndDocument:(NSXMLParser *)parser {
     //NSLog(@"%@", self.Products);
-    [self.delegate parserDidFinish:self];
+    [self.delegate loginDidFinish:self];
 }
 
 -(void)registerProduct:(BYProduct *)product withIdentifier:(NSString *)identifier {

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB5BAB8117C54C320025B4E0 /* BYCellPrototypeMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */; };
+		DB5BAB8417C54DDE0025B4E0 /* BYMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */; };
 		DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */; };
 		DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */; };
 		DBD33D9417B7C4AF0081B999 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9317B7C4AF0081B999 /* UIKit.framework */; };
@@ -26,6 +28,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB5BAB7F17C54C320025B4E0 /* BYCellPrototypeMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BYCellPrototypeMenu.h; sourceTree = "<group>"; };
+		DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYCellPrototypeMenu.m; sourceTree = "<group>"; };
+		DB5BAB8217C54DDE0025B4E0 /* BYMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BYMenu.h; sourceTree = "<group>"; };
+		DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYMenu.m; sourceTree = "<group>"; };
 		DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = iPadStoryBoard.storyboard; sourceTree = "<group>"; };
 		DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BYCellPrototypeLogin.h; path = ../BYCellPrototypeLogin.h; sourceTree = "<group>"; };
 		DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BYCellPrototypeLogin.m; path = ../BYCellPrototypeLogin.m; sourceTree = "<group>"; };
@@ -105,6 +111,8 @@
 				DBD33DB117B7D0140081B999 /* BYProductFactory.m */,
 				DBD33DB317B7D1440081B999 /* BYProduct.h */,
 				DBD33DB417B7D1440081B999 /* BYProduct.m */,
+				DB5BAB8217C54DDE0025B4E0 /* BYMenu.h */,
+				DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */,
 				DBD33DB617B7E9600081B999 /* BYRootViewController.h */,
 				DBD33DB717B7E9600081B999 /* BYRootViewController.m */,
 				DBD33DB917B7EB7C0081B999 /* BYProductImagesScrollView.h */,
@@ -113,6 +121,8 @@
 				DBD33DBD17B7FDB80081B999 /* BYBasketView.m */,
 				DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */,
 				DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */,
+				DB5BAB7F17C54C320025B4E0 /* BYCellPrototypeMenu.h */,
+				DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */,
 				DBD33D9A17B7C4AF0081B999 /* Supporting Files */,
 			);
 			path = byou;
@@ -207,6 +217,8 @@
 				DBD33DBB17B7EB7C0081B999 /* BYProductImagesScrollView.m in Sources */,
 				DBD33DBE17B7FDB80081B999 /* BYBasketView.m in Sources */,
 				DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */,
+				DB5BAB8117C54C320025B4E0 /* BYCellPrototypeMenu.m in Sources */,
+				DB5BAB8417C54DDE0025B4E0 /* BYMenu.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

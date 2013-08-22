@@ -10,7 +10,7 @@ NSString*(^createKey)(NSString*,NSString*) = ^(NSString* collection,NSString* su
     return [NSString stringWithFormat:@"%@ - %@",collection,subCol];
 };
 
-NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
+NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d}", menuId, colorId];
 };
 
@@ -20,9 +20,15 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
 #import "BYProductFactory.h"
 
 @implementation BYProductFactory {
+
+    NSString* URLMethod;
+    
     NSMutableData* receivedData;
-    NSMutableString* imagesBaseHref;
     NSString* usrName;
+    NSString* actualMenu;
+    int actualMenuId;
+
+    NSMutableString* imagesBaseHref;
     int actualCollection;
     int actualImage;
 }
@@ -31,6 +37,7 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
 @synthesize delegate;
 @synthesize loginMessage;
 @synthesize loginMessageColor;
+@synthesize menus;
 
 -(id)init {
     if (self = [super init]) {
@@ -135,7 +142,10 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
     return self;
 }
 
+#pragma mark - Login Methods
+
 -(void)authLoginName:(NSString *)usr withPass:(NSString *)pass {
+    URLMethod = @"Login";
     usrName = usr;
     self.loginMessage = @"";
     if ([pass length] == 0) pass = @"__empty";
@@ -161,9 +171,19 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
         actualCollection = 1;
         actualImage = 1;
         self.Products = [NSMutableDictionary dictionary];
+        self.menus = [NSMutableArray array];
     }
 }
 
+-(void)registerMenu:(NSString *)menuName withJSONRequest:(NSString *)request {
+    BYMenu* tempMenu = [[BYMenu alloc] init];
+    tempMenu.menuName = menuName;
+    tempMenu.JSONRequest = request;
+    [self.menus addObject:tempMenu];
+}
+
+
+#pragma mark - URlConnection Delegates
 
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSLog(@"Error: %@", error);
@@ -188,19 +208,36 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
     [parser parse];
 }
 
+#pragma mark - XMLParser delegates
+
 -(void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
-    NSLog(@"%@",elementName);
+
+    // Auth node
     if ([elementName isEqualToString:@"result"]) {
         if ([[attributeDict objectForKey:@"status"] isEqualToString:@"no"]) {
             self.loginMessage = @"Hibás felhasználónév vagy jelszó!";
             self.loginMessageColor = [UIColor redColor];
             [parser abortParsing];
-            [self.delegate loginDidFinish:self];
+            [self.delegate loginDidFinish];
         } else if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
             self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", usrName];
             self.loginMessageColor = [UIColor blackColor];
         }
     }
+    
+    // Category menu nodes
+    if ([elementName isEqualToString:@"menu"]) {
+        actualMenu = [attributeDict objectForKey:@"name"];
+        actualMenuId = [[attributeDict objectForKey:@"menuId"] intValue];
+    }
+    
+    if ([elementName isEqualToString:@"sub"]) {
+        [self registerMenu:createKey(actualMenu,[attributeDict objectForKey:@"name"])
+           withJSONRequest:createJSONRequest(actualMenuId,[[attributeDict objectForKey:@"colorId"] intValue])];
+    }
+    
+    
+    // Category values
     if ([elementName isEqualToString:@"GALLERY"]) {
         imagesBaseHref = [attributeDict objectForKey:@"LOC"];
         NSLog(@"Gallery : %@",attributeDict);
@@ -218,16 +255,18 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
         BYProduct* tempProduct = [[BYProduct alloc] init];
         tempProduct.pieces = [[attributeDict objectForKey:@"DB"] intValue];
         tempProduct.imageURL = [NSString stringWithFormat:@"%@/%@",imagesBaseHref,[attributeDict objectForKey:@"SRC"]];
-        [self registerProduct:tempProduct
-               withIdentifier:createKey(actualCollection, actualImage)];
+        //[self registerProduct:tempProduct
+        //       withIdentifier:createKey(actualCollection, actualImage)];
         actualImage ++;
     }
 }
 
 -(void)parserDidEndDocument:(NSXMLParser *)parser {
-    //NSLog(@"%@", self.Products);
-    [self.delegate loginDidFinish:self];
+    if ([URLMethod isEqualToString:@"Login"]) [self.delegate loginDidFinish];
 }
+
+
+
 
 -(void)registerProduct:(BYProduct *)product withIdentifier:(NSString *)identifier {
     [self.Products setObject:product forKey:identifier];
@@ -245,14 +284,14 @@ NSString*(^createKeys)(int,int) = ^(int menuId,int colorId) {
 }
 
 -(BYProduct*)getProductForm:(int)collection andPos:(int)pos {
-    return [self.Products objectForKey:createKey(collection,pos)];
+    //return [self.Products objectForKey:createKey(collection,pos)];
 }
 
 -(int)dividePieces:(int)Value forCollection:(int)collection andPos:(int)pos {
     BYProduct* tempProduct = [self getProductForm:collection andPos:pos];
     tempProduct.pieces -= Value;
     tempProduct.basket += Value;
-    [self registerProduct:tempProduct withIdentifier:createKey(collection, pos)];
+    //[self registerProduct:tempProduct withIdentifier:createKey(collection, pos)];
     return tempProduct.pieces;
 }
 

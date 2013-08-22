@@ -8,6 +8,8 @@
 
 #import "BYRootViewController.h"
 #import "BYCellPrototypeLogin.h"
+#import "BYCellPrototypeMenu.h"
+#import "BYMenu.h"
 
 @interface BYRootViewController ()
 
@@ -16,11 +18,13 @@
 
 @implementation BYRootViewController {
     UIActivityIndicatorView* loginAct;
+    NSString* tableVersion;
 }
 
 @synthesize Products;
 @synthesize scrollView;
 @synthesize actualPieces;
+@synthesize tableViewCont;
 //@synthesize basketListView;
 
 @synthesize userName;
@@ -46,6 +50,7 @@
     //self.basketListView.view.frame = CGRectMake(0.0f, 70.0f, self.view.bounds.size.width, self.view.bounds.size.height - 70.0);
     self.Products = [[BYProductFactory alloc] init];
     self.Products.delegate = self;
+    tableVersion = @"Login";
     
 }
 
@@ -57,11 +62,6 @@
     }
 }
 
--(void)loginDidFinish:(BYProductFactory *)sender {
-    self.statusLabel.text = sender.loginMessage;
-    self.statusLabel.textColor = sender.loginMessageColor;
-    [loginAct stopAnimating];
-}
 
 - (void)parserDidFinish:(BYProductFactory *)sender {
     [self.scrollView addProductsToView:[self.Products getCollection:1]];
@@ -117,55 +117,117 @@
     [self setUserName:nil];
     [self setTableViews:nil];
     [self setStatusLabel:nil];
+    [self setTableViewCont:nil];
     [super viewDidUnload];
 }
 
-#pragma mark -
-#pragma mark TableView DataSource Methods
+#pragma mark - Login Methods
+
+-(void)loginDidFinish {
+    self.statusLabel.text = self.Products.loginMessage;
+    self.statusLabel.textColor = self.Products.loginMessageColor;
+    [loginAct stopAnimating];
+    if ([self.Products.menus count] != 0) {
+        tableVersion = @"Menu";
+        [self.tableViewCont reloadData];
+    }
+}
+
+#pragma mark - TableView DataSource Methods
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    if ([tableVersion isEqualToString:@"Login"]) return 1;
+    if ([tableVersion isEqualToString:@"Menu"]) return 2;
+    return 0;
+}
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    if ([tableVersion isEqualToString:@"Login"]) return 3;
+    if ([tableVersion isEqualToString:@"Menu"]) {
+        if (section == 0) return [self.Products.menus count];
+        if (section == 1) return 2;
+    }
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 2) {
-        static NSString *cellIndetifier = @"LoginSend";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifier forIndexPath:indexPath];
-        loginAct = (UIActivityIndicatorView*)[cell viewWithTag:1];
-        return cell;
-    } else {
-        static NSString *CellIdentifier = @"LoginCell";
-        BYCellPrototypeLogin *cell = (BYCellPrototypeLogin *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil) {
-            cell = [[BYCellPrototypeLogin alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-            NSLog(@"%@",cell);
-        }
+    if ([tableVersion isEqualToString:@"Login"]) {
+        if (indexPath.row == 2) {
+            static NSString *cellIndetifier = @"LoginSend";
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifier forIndexPath:indexPath];
+            loginAct = (UIActivityIndicatorView*)[cell viewWithTag:1];
+            return cell;
+        } else {
+            static NSString *CellIdentifier = @"LoginCell";
+            BYCellPrototypeLogin *cell = (BYCellPrototypeLogin *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil) {
+                cell = [[BYCellPrototypeLogin alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            }
     
-        switch (indexPath.row) {
-            case 0:
-                cell.label.text = @"Felhasználó";
-                break;
-            case 1:
-                cell.label.text = @"Jelszó";
-                cell.aTextField.secureTextEntry = YES;
-                break;
+            switch (indexPath.row) {
+                case 0:
+                    cell.label.text = @"Felhasználó";
+                    break;
+                case 1:
+                    cell.label.text = @"Jelszó";
+                    cell.aTextField.secureTextEntry = YES;
+                    break;
+            }
+            return cell;
         }
-        return cell;
     }
+    
+    if ([tableVersion isEqualToString:@"Menu"]) {
+        if (indexPath.section == 0) {
+            static NSString *cellIdentifier = @"MenuCell";
+            BYCellPrototypeMenu *cell = (BYCellPrototypeMenu*)[tableView dequeueReusableCellWithIdentifier:cellIdentifier
+                                                                                          forIndexPath:indexPath];
+            if (cell == nil) {
+                cell = [[BYCellPrototypeMenu alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            }
+            cell.menuName.text = [(BYMenu*)[self.Products.menus objectAtIndex:indexPath.row] menuName];
+            return cell;
+        }
+        if (indexPath.section == 1) {
+            NSString *cellIdentifier = [[NSString alloc] init];
+            if (indexPath.row == 0) {
+                cellIdentifier = @"SignOutCell";
+            } else {
+                cellIdentifier = @"BasketCell";
+            }
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+            if (cell == nil) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            }
+            return cell;
+        }
+    }
+    
+    return nil;
 }
 
-#pragma mark -
-#pragma mark TableView Delegate Methods
+#pragma mark - TableView Delegate Methods
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == 2) {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        BYCellPrototypeLogin *cellAuth = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:indexPath.section]];
-        BYCellPrototypeLogin *cellName = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
-        [self.Products authLoginName:cellName.aTextField.text withPass:cellAuth.aTextField.text];
-        [loginAct startAnimating];
-        [self.view endEditing:YES];
+    if ([tableVersion isEqualToString:@"Login"]) {
+        if (indexPath.row == 2) {
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            BYCellPrototypeLogin *cellAuth = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:indexPath.section]];
+            BYCellPrototypeLogin *cellName = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
+            [self.Products authLoginName:cellName.aTextField.text withPass:cellAuth.aTextField.text];
+            cellAuth.aTextField.text = @"";
+            cellName.aTextField.text = @"";
+            [loginAct startAnimating];
+            [self.view endEditing:YES];
+        }
+    }
+    if ([tableVersion isEqualToString:@"Menu"]) {
+        if (indexPath.row == 0 && indexPath.section == 1) {
+            tableVersion = @"Login";
+            [self.tableViewCont reloadData];
+            self.statusLabel.text = @"";
+        }
     }
 }
 

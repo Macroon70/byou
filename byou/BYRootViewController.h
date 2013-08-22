@@ -25,6 +25,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 #pragma mark -
 #pragma mark ViewControllers
+@property (weak, nonatomic) IBOutlet UITableView *tableViewCont;
 
 #pragma mark -
 #pragma mark Outlets

@@ -8,18 +8,21 @@
 
 #import <Foundation/Foundation.h>
 #import "BYProduct.h"
+#import "BYMenu.h"
 
 @class BYProductFactory;
 
 @protocol BYProductFactoryDelegate
 
--(void)loginDidFinish:(BYProductFactory*)sender;
+-(void)loginDidFinish;
 
 @end
 
 @interface BYProductFactory : NSObject <NSURLConnectionDataDelegate, NSURLConnectionDelegate, NSXMLParserDelegate>
 
 -(void)authLoginName:(NSString*)usr withPass:(NSString*)pass;
+
+-(void)registerMenu:(NSString*)menuName withJSONRequest:(NSString*)request;
 
 -(void)registerProduct:(BYProduct*)product withIdentifier:(NSString*)identifier;
 -(int)dividePieces:(int)Value forCollection:(int)collection andPos:(int)pos;
@@ -30,6 +33,7 @@
 -(BYProduct*)getProductForm:(int)collection andPos:(int)pos;
 
 @property (nonatomic, strong) NSMutableDictionary* Products;
+@property (nonatomic, strong) NSMutableArray* menus;
 @property (nonatomic, weak) id <BYProductFactoryDelegate> delegate;
 
 @property (nonatomic, strong) NSString* loginMessage;

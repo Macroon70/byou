@@ -18,6 +18,8 @@
 
 @implementation BYRootViewController {
     UIActivityIndicatorView* loginAct;
+    UIActivityIndicatorView* menuAct;
+    NSString* menuName;
     NSString* tableVersion;
 }
 
@@ -36,9 +38,6 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     /*
-    self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.scrollView.delegate = self;
-    [self.view addSubview:self.scrollView];
     self.basketView = [[BYBasketView alloc] initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,70)];
     self.basketView.delegateBasketAdd = self;
     [self.view addSubview:self.basketView];
@@ -58,7 +57,7 @@
     [self.piecesPicker removeFromSuperview];
     if (sScrollView == self.scrollView) {
         int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
-        [self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:pageNum] withNum:pageNum];
+        //[self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:pageNum] withNum:pageNum];
     }
 }
 
@@ -118,10 +117,46 @@
     [self setTableViews:nil];
     [self setStatusLabel:nil];
     [self setTableViewCont:nil];
+    [self setBack_button:nil];
+    [self setCategoryName:nil];
+    [self setCategoryCont:nil];
+    [self setStockInfo:nil];
+    [self setBasketInfo:nil];
+    [self setItemInfoCont:nil];
     [super viewDidUnload];
 }
 
-#pragma mark - Login Methods
+#pragma mark - self delegates
+
+-(IBAction)back_pushed:(id)sender {
+    self.back_button.hidden = YES;
+    self.CategoryCont.hidden = YES;
+    self.itemInfoCont.hidden = YES;
+    [self.scrollView removeFromSuperview];
+}
+
+- (IBAction)nextItem:(id)sender {
+    CGPoint currentOffset = self.scrollView.contentOffset;
+    currentOffset.x = currentOffset.x + self.view.bounds.size.width;
+    if (self.scrollView.contentSize.width > currentOffset.x)
+        [self.scrollView setContentOffset:currentOffset animated:YES];
+}
+
+- (IBAction)prevItem:(id)sender {
+    CGPoint currentOffset = self.scrollView.contentOffset;
+    currentOffset.x = currentOffset.x - self.view.bounds.size.width;
+    if (currentOffset.x >= 0)
+        [self.scrollView setContentOffset:currentOffset animated:YES];
+}
+
+- (IBAction)basketDec:(id)sender {
+}
+
+- (IBAction)basketInc:(id)sender {
+}
+
+
+#pragma mark - Factory Delegates
 
 -(void)loginDidFinish {
     self.statusLabel.text = self.Products.loginMessage;
@@ -133,11 +168,24 @@
     }
 }
 
+-(void)collectionDidFinish {
+    self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 56.0f, self.view.bounds.size.width, self.view.bounds.size.height - 56.0f)];
+    self.scrollView.delegate = self;
+    self.back_button.hidden = NO;
+    self.CategoryCont.hidden = NO;
+    self.itemInfoCont.hidden = NO;
+    self.CategoryName.text = menuName;
+    [menuAct stopAnimating];
+    [self.scrollView addProductsToView:self.Products.products];
+    //[self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:0] withNum:1];
+    [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
+}
+
 #pragma mark - TableView DataSource Methods
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if ([tableVersion isEqualToString:@"Login"]) return 1;
-    if ([tableVersion isEqualToString:@"Menu"]) return 2;
+    if ([tableVersion isEqualToString:@"Menu"]) return 3;
     return 0;
 }
 
@@ -145,7 +193,8 @@
     if ([tableVersion isEqualToString:@"Login"]) return 3;
     if ([tableVersion isEqualToString:@"Menu"]) {
         if (section == 0) return [self.Products.menus count];
-        if (section == 1) return 2;
+        if (section == 1) return 1;
+        if (section == 2) return 1;
     }
     return 0;
 }
@@ -190,12 +239,15 @@
             return cell;
         }
         if (indexPath.section == 1) {
-            NSString *cellIdentifier = [[NSString alloc] init];
-            if (indexPath.row == 0) {
-                cellIdentifier = @"SignOutCell";
-            } else {
-                cellIdentifier = @"BasketCell";
+            static NSString *cellIdentifier = @"BasketCell";
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+            if (cell == nil) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
             }
+            return cell;
+        }
+        if (indexPath.section == 2) {
+            static NSString *cellIdentifier = @"SignOutCell";
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
             if (cell == nil) {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
@@ -223,10 +275,19 @@
         }
     }
     if ([tableVersion isEqualToString:@"Menu"]) {
-        if (indexPath.row == 0 && indexPath.section == 1) {
+        if (indexPath.row == 0 && indexPath.section == 2) {
             tableVersion = @"Login";
             [self.tableViewCont reloadData];
             self.statusLabel.text = @"";
+        }
+        
+        if (indexPath.section == 0) {
+            BYCellPrototypeMenu *clickedCell = (BYCellPrototypeMenu*)[tableView cellForRowAtIndexPath:indexPath];
+            menuAct = clickedCell.menuItemsLoading;
+            menuName = clickedCell.menuName.text;
+            [menuAct startAnimating];
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            [self.Products getMenuContents:indexPath.row];
         }
     }
 }

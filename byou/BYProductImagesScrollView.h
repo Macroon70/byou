@@ -10,8 +10,8 @@
 
 @interface BYProductImagesScrollView : UIScrollView
 
--(void)addProductsToView:(NSMutableDictionary*)dProducts;
+-(void)addProductsToView:(NSMutableArray*)dProducts;
 
-@property (nonatomic, retain) NSMutableDictionary* products;
+@property (nonatomic, retain) NSMutableArray* products;
 
 @end

@@ -32,5 +32,17 @@
 @property (weak, nonatomic) IBOutlet UILabel *userName;
 @property (strong, nonatomic) IBOutlet UIView *tableViews;
 
+@property (weak, nonatomic) IBOutlet UIButton *back_button;
+- (IBAction)back_pushed:(id)sender;
+@property (weak, nonatomic) IBOutlet UILabel *CategoryName;
+@property (weak, nonatomic) IBOutlet UIView *CategoryCont;
+- (IBAction)nextItem:(id)sender;
+- (IBAction)prevItem:(id)sender;
+@property (weak, nonatomic) IBOutlet UIView *itemInfoCont;
+@property (weak, nonatomic) IBOutlet UILabel *stockInfo;
+@property (weak, nonatomic) IBOutlet UILabel *basketInfo;
+- (IBAction)basketDec:(id)sender;
+- (IBAction)basketInc:(id)sender;
+
 
 @end

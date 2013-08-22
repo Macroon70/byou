@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		DB5BAB8117C54C320025B4E0 /* BYCellPrototypeMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */; };
 		DB5BAB8417C54DDE0025B4E0 /* BYMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */; };
+		DB5BAB8617C633590025B4E0 /* back_button.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5BAB8517C633590025B4E0 /* back_button.png */; };
+		DB5BAB8B17C63AF00025B4E0 /* forward_button.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5BAB8817C63AF00025B4E0 /* forward_button.png */; };
+		DB5BAB8C17C63AF00025B4E0 /* icon_back.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5BAB8917C63AF00025B4E0 /* icon_back.png */; };
+		DB5BAB8D17C63AF00025B4E0 /* icon_forward.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5BAB8A17C63AF00025B4E0 /* icon_forward.png */; };
 		DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */; };
 		DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */; };
 		DBD33D9417B7C4AF0081B999 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9317B7C4AF0081B999 /* UIKit.framework */; };
@@ -32,6 +36,10 @@
 		DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYCellPrototypeMenu.m; sourceTree = "<group>"; };
 		DB5BAB8217C54DDE0025B4E0 /* BYMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BYMenu.h; sourceTree = "<group>"; };
 		DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYMenu.m; sourceTree = "<group>"; };
+		DB5BAB8517C633590025B4E0 /* back_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_button.png; sourceTree = "<group>"; };
+		DB5BAB8817C63AF00025B4E0 /* forward_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = forward_button.png; sourceTree = "<group>"; };
+		DB5BAB8917C63AF00025B4E0 /* icon_back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_back.png; sourceTree = "<group>"; };
+		DB5BAB8A17C63AF00025B4E0 /* icon_forward.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_forward.png; sourceTree = "<group>"; };
 		DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = iPadStoryBoard.storyboard; sourceTree = "<group>"; };
 		DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BYCellPrototypeLogin.h; path = ../BYCellPrototypeLogin.h; sourceTree = "<group>"; };
 		DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BYCellPrototypeLogin.m; path = ../BYCellPrototypeLogin.m; sourceTree = "<group>"; };
@@ -74,6 +82,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DB5BAB8717C63AD70025B4E0 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				DB5BAB8817C63AF00025B4E0 /* forward_button.png */,
+				DB5BAB8917C63AF00025B4E0 /* icon_back.png */,
+				DB5BAB8A17C63AF00025B4E0 /* icon_forward.png */,
+				DB5BAB8517C633590025B4E0 /* back_button.png */,
+			);
+			name = images;
+			sourceTree = "<group>";
+		};
 		DBD33D8717B7C4AF0081B999 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +142,7 @@
 				DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */,
 				DB5BAB7F17C54C320025B4E0 /* BYCellPrototypeMenu.h */,
 				DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */,
+				DB5BAB8717C63AD70025B4E0 /* images */,
 				DBD33D9A17B7C4AF0081B999 /* Supporting Files */,
 			);
 			path = byou;
@@ -199,6 +219,10 @@
 				DBD33DA817B7C4AF0081B999 /* Default@2x.png in Resources */,
 				DBD33DAA17B7C4AF0081B999 /* Default-568h@2x.png in Resources */,
 				DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */,
+				DB5BAB8617C633590025B4E0 /* back_button.png in Resources */,
+				DB5BAB8B17C63AF00025B4E0 /* forward_button.png in Resources */,
+				DB5BAB8C17C63AF00025B4E0 /* icon_back.png in Resources */,
+				DB5BAB8D17C63AF00025B4E0 /* icon_forward.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,21 +24,22 @@
     return self;
 }
 
--(void)addProductsToView:(NSMutableDictionary *)dProducts {
-    self.products = dProducts;
-    CGRect bounds = [[UIScreen mainScreen] bounds];
+-(void)addProductsToView:(NSMutableArray *)dProducts {
+    self.products = [NSMutableArray arrayWithArray:dProducts];
+    //CGRect bounds = [[UIScreen mainScreen] bounds];
     __block int iPos = 0;
-    [self.products enumerateKeysAndObjectsUsingBlock:^(NSString* key, BYProduct* obj, BOOL *stop) {
+    [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+        NSLog(@"%@",obj.imageURL);
         NSURL *url = [NSURL URLWithString:obj.imageURL];
         NSData *data = [NSData dataWithContentsOfURL:url];
         UIImage *image = [UIImage imageWithData:data];
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,bounds.size.width,bounds.size.height)];
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
         imageView.image = image;
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:imageView];
-        iPos += bounds.size.width;
+        iPos += self.bounds.size.width;
     }];
-    self.contentSize = CGSizeMake(iPos,bounds.size.height);
+    self.contentSize = CGSizeMake(iPos,self.bounds.size.height - 56.0f);
 }
 
 /*

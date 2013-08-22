@@ -29,7 +29,6 @@
     //CGRect bounds = [[UIScreen mainScreen] bounds];
     __block int iPos = 0;
     [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
-        NSLog(@"%@",obj.imageURL);
         NSURL *url = [NSURL URLWithString:obj.imageURL];
         NSData *data = [NSData dataWithContentsOfURL:url];
         UIImage *image = [UIImage imageWithData:data];

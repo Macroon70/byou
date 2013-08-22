@@ -14,6 +14,10 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d}", menuId, colorId];
 };
 
+NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
+    return [NSString stringWithFormat:@"%@ - %d",collection,ID];
+};
+
 #define REQUEST_URL @"http://w0rkz.exceex.hu/byouWarehouse/"
 
 #import "BYProductFactory.h"
@@ -24,6 +28,7 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     NSMutableData* receivedData;
     NSString* usrName;
     NSString* actualMenu;
+    NSString* actualName;
     int actualMenuId;
     NSMutableString* imagesBaseHref;
 
@@ -36,6 +41,8 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
 @synthesize loginMessage;
 @synthesize loginMessageColor;
 @synthesize menus;
+@synthesize basket;
+@synthesize allBasketKeys;
 
 #pragma mark - Init methods
 
@@ -60,6 +67,8 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
         actualCollection = 1;
         actualImage = 1;
         self.menus = [NSMutableArray array];
+        self.basket = [NSMutableDictionary dictionary];
+        self.allBasketKeys = [NSArray array];
     }
 }
 
@@ -70,11 +79,56 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     [self.menus addObject:tempMenu];
 }
 
+#pragma mark - Basket methods
+
+-(void)sendBasketInfoToDict:(NSString*)menuName {
+    [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+        NSString* basketKey = createKeyForBasket(menuName,obj.ID);
+        if ([self.basket objectForKey:basketKey] != nil) {
+            if (obj.basket == 0) {
+                [self.basket removeObjectForKey:basketKey];
+            } else {
+                [self.basket setObject:obj forKey:basketKey];
+            }
+        } else {
+            if (obj.basket != 0) {
+                [self.basket setObject:obj forKey:basketKey];
+            }
+        }
+        self.allBasketKeys = [self.basket allKeys];
+    }];
+}
+
+-(void)getBasketInfoFromDict:(NSString*)menuName {
+    [[self.products copy] enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+        NSString* basketKey = createKeyForBasket(menuName,obj.ID);
+        if ([self.basket objectForKey:basketKey] != nil) {
+            BYProduct *tempObject = [self.basket objectForKey:basketKey];
+            tempObject.pieces = obj.pieces;
+            tempObject.imageURL = obj.imageURL;
+            if (tempObject.pieces < tempObject.basket) {
+                tempObject.basket = tempObject.pieces;
+            }
+            tempObject.pieces -= tempObject.basket;
+            [self.products replaceObjectAtIndex:idx withObject:tempObject];
+        }
+    }];
+}
+
+-(int)BasketItemsSumm {
+    __block int itemsSumm = 0;
+    [self.basket enumerateKeysAndObjectsUsingBlock:^(id key, BYProduct* obj, BOOL *stop) {
+        itemsSumm += obj.basket;
+    }];
+    return itemsSumm;
+}
+
 #pragma mark - Menu methods
 
 -(void)getMenuContents:(int)menuIndex {
     URLMethod = @"Collection";
     BYMenu* collectMenuDetails = [self.menus objectAtIndex:menuIndex];
+    actualName = collectMenuDetails.menuName;
     if ([self setConnection:@"imgs" withPostName:@"getItems" andPostValue:collectMenuDetails.JSONRequest]) {
         self.products = [NSMutableArray array];
     }
@@ -84,9 +138,41 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     [self.products addObject:product];
 }
 
+-(void)setProductValues:(int)position direction:(NSString *)direction {
+    BYProduct *changingProduct = [self.products objectAtIndex:position];
+    if ([direction isEqualToString:@"UP"] && changingProduct.pieces != 0) {
+        changingProduct.basket ++;
+        changingProduct.pieces --;
+    } else if ([direction isEqualToString:@"DOWN"] && changingProduct.basket != 0) {
+        changingProduct.basket --;
+        changingProduct.pieces ++;
+    }
+}
+
 #pragma mark - Product Methods
 
+-(BYProduct*)getProductForm:(int)pos {
+    return [self.products objectAtIndex:pos];
+}
 
+#pragma mark - Basket Methods
+
+-(void)PlaceOrder {
+    URLMethod = @"PlaceOrder";
+    __block NSString *JSONrequest = @"{\"order\":[";
+    [self.basket enumerateKeysAndObjectsUsingBlock:^(id key, BYProduct* obj, BOOL *stop) {
+        JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d},",JSONrequest,obj.ID,obj.basket];
+    }];
+    JSONrequest = [JSONrequest substringToIndex:[JSONrequest length] -1];
+    JSONrequest = [NSString stringWithFormat:@"%@]}",JSONrequest];
+    NSLog(@"%@",JSONrequest);
+    if ([self setConnection:@"get" withPostName:@"json" andPostValue:JSONrequest]) {
+        self.products = [NSMutableArray array];
+    }
+    self.basket = [NSMutableArray array];
+    self.allBasketKeys = [NSArray array];
+    
+}
 
 #pragma mark - URlConnection methods
 
@@ -170,8 +256,10 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
     
     if ([elementName isEqualToString:@"IMAGE"]) {
         BYProduct* tempProduct = [[BYProduct alloc] init];
+        tempProduct.CategoryName = actualName;
         tempProduct.pieces = [[attributeDict objectForKey:@"DB"] intValue];
         tempProduct.imageURL = [NSString stringWithFormat:@"%@/%@",imagesBaseHref,[attributeDict objectForKey:@"SRC"]];
+        tempProduct.ID = [[attributeDict objectForKey:@"ITEMID"] intValue];
         [self registerProduct:tempProduct];
         actualImage ++;
     }
@@ -180,41 +268,6 @@ NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
 -(void)parserDidEndDocument:(NSXMLParser *)parser {
     if ([URLMethod isEqualToString:@"Login"]) [self.delegate loginDidFinish];
     if ([URLMethod isEqualToString:@"Collection"]) [self.delegate collectionDidFinish];
-}
-
-#pragma mark - old Methods
-
-
-
--(NSMutableDictionary*)getCollection:(int)colNumber {
-    if (colNumber <= 0) colNumber = 1;
-    NSMutableDictionary* tempCollection = [NSMutableDictionary dictionary];
-/*    [self.products enumerateKeysAndObjectsUsingBlock:^(NSString* key, BYProduct* obj, BOOL *stop) {
-        if ([key hasPrefix:[NSString stringWithFormat:@"collection%d",colNumber]]) {
-            [tempCollection setObject:obj forKey:key];
-        }
-    }];*/
-    return tempCollection;
-}
-
--(BYProduct*)getProductForm:(int)collection andPos:(int)pos {
-    //return [self.Products objectForKey:createKey(collection,pos)];
-}
-
--(int)dividePieces:(int)Value forCollection:(int)collection andPos:(int)pos {
-    BYProduct* tempProduct = [self getProductForm:collection andPos:pos];
-    tempProduct.pieces -= Value;
-    tempProduct.basket += Value;
-    //[self registerProduct:tempProduct withIdentifier:createKey(collection, pos)];
-    return tempProduct.pieces;
-}
-
--(NSMutableDictionary*)getProductWithBasketValues {
-    __block NSMutableDictionary *tempList = [NSMutableDictionary dictionary];
-/*    [self.Products enumerateKeysAndObjectsUsingBlock:^(NSString* key, BYProduct* obj, BOOL *stop) {
-        if (obj.basket > 0) [tempList setObject:obj forKey:key];
-    }];*/
-    return tempList;
 }
 
 @end

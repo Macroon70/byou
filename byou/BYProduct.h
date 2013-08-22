@@ -11,6 +11,8 @@
 @interface BYProduct : NSObject
 
 @property (nonatomic, strong) NSMutableString* imageURL;
+@property (nonatomic, strong) NSString* CategoryName;
+@property int ID;
 @property int pieces;
 @property int basket;
 

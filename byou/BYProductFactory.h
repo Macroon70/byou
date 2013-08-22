@@ -25,21 +25,24 @@
 -(void)registerMenu:(NSString*)menuName withJSONRequest:(NSString*)request;
 
 -(void)registerProduct:(BYProduct*)product;
-
+-(void)setProductValues:(int)position direction:(NSString*)direction;
 
 -(void)getMenuContents:(int)menuIndex;
 
+-(BYProduct*)getProductForm:(int)pos;
 
+-(int)BasketItemsSumm;
 
--(int)dividePieces:(int)Value forCollection:(int)collection andPos:(int)pos;
--(NSMutableDictionary*)getProductWithBasketValues;
--(NSMutableDictionary*)getCollection:(int)colNumber;
+-(void)PlaceOrder;
 
--(BYProduct*)getProductForm:(int)collection andPos:(int)pos;
+-(void)sendBasketInfoToDict:(NSString*)menuName;
+-(void)getBasketInfoFromDict:(NSString*)menuName;
 
 @property (nonatomic, strong) NSMutableArray* products;
 @property (nonatomic, strong) NSMutableArray* menus;
+@property (nonatomic, strong) NSMutableDictionary* basket;
 @property (nonatomic, weak) id <BYProductFactoryDelegate> delegate;
+@property (nonatomic, strong) NSArray* allBasketKeys;
 
 @property (nonatomic, strong) NSString* loginMessage;
 @property (nonatomic, strong) UIColor* loginMessageColor;

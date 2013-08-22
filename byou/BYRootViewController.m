@@ -9,7 +9,9 @@
 #import "BYRootViewController.h"
 #import "BYCellPrototypeLogin.h"
 #import "BYCellPrototypeMenu.h"
+#import "BYCellPrototypeBasket.h"
 #import "BYMenu.h"
+#import "BYProduct.h"
 
 @interface BYRootViewController ()
 
@@ -21,13 +23,14 @@
     UIActivityIndicatorView* menuAct;
     NSString* menuName;
     NSString* tableVersion;
+    
+    NSTimer* repeatTimer;
 }
 
 @synthesize Products;
 @synthesize scrollView;
 @synthesize actualPieces;
 @synthesize tableViewCont;
-//@synthesize basketListView;
 
 @synthesize userName;
 
@@ -36,75 +39,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
-    /*
-    self.basketView = [[BYBasketView alloc] initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,70)];
-    self.basketView.delegateBasketAdd = self;
-    [self.view addSubview:self.basketView];
-    self.piecesPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0.0f, 70.0f, self.view.bounds.size.width, 100.0f)];
-    self.piecesPicker.delegate = self;
-    self.actualPieces = [NSMutableArray array];
-    */
-    //self.basketListView = [[BYBasketListViewController alloc] init];
-    //self.basketListView.view.frame = CGRectMake(0.0f, 70.0f, self.view.bounds.size.width, self.view.bounds.size.height - 70.0);
     self.Products = [[BYProductFactory alloc] init];
     self.Products.delegate = self;
     tableVersion = @"Login";
-    
-}
-
--(void)scrollViewDidScroll:(UIScrollView *)sScrollView {
-    [self.piecesPicker removeFromSuperview];
-    if (sScrollView == self.scrollView) {
-        int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
-        //[self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:pageNum] withNum:pageNum];
-    }
 }
 
 
-- (void)parserDidFinish:(BYProductFactory *)sender {
-    [self.scrollView addProductsToView:[self.Products getCollection:1]];
-    [self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:0] withNum:1];
-}
-
--(void)addBasketPushed {
-    if ([self.view.subviews containsObject:self.piecesPicker]) {
-        [self.piecesPicker removeFromSuperview];
-    } else {
-        int currentProduct = self.basketView.actualProduct;
-        BYProduct* actualProduct = [self.Products getProductForm:1 andPos:currentProduct];
-        [self.actualPieces removeAllObjects];
-        for (int i=0; i <= actualProduct.pieces; i++) {
-            [self.actualPieces addObject:[NSString stringWithFormat:@"%d darab",i]];
-        }
-        [self.piecesPicker reloadAllComponents];
-        [self.view addSubview:self.piecesPicker];
-    }
-}
-
--(void)basketPushed {
-}
-
--(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-    return 1;
-}
-
--(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    return [self.actualPieces count];
-}
-
--(UIView*)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view {
-    UILabel* tempLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 40)];
-    tempLabel.text = [self.actualPieces objectAtIndex:row];
-    tempLabel.textAlignment = UITextAlignmentCenter;
-    return tempLabel;
-}
-
--(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    [pickerView removeFromSuperview];
-    int newPieces = [self.Products dividePieces:row forCollection:1 andPos:self.basketView.actualProduct];
-    self.basketView.stockInfo.text = [NSString stringWithFormat:@"Készleten %d",newPieces];
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -126,12 +66,22 @@
     [super viewDidUnload];
 }
 
+
+#pragma mark - Catalog Methods
+
+-(void)setStockInfoLabel:(int)position {
+    BYProduct *actualProduct = [self.Products getProductForm:position];
+    self.stockInfo.text = [NSString stringWithFormat:@"%d",actualProduct.pieces];
+    self.basketInfo.text = [NSString stringWithFormat:@"%d", actualProduct.basket];
+}
+
 #pragma mark - self delegates
 
 -(IBAction)back_pushed:(id)sender {
     self.back_button.hidden = YES;
     self.CategoryCont.hidden = YES;
     self.itemInfoCont.hidden = YES;
+    [self.Products sendBasketInfoToDict:menuName];
     [self.scrollView removeFromSuperview];
 }
 
@@ -149,10 +99,42 @@
         [self.scrollView setContentOffset:currentOffset animated:YES];
 }
 
+-(void)timerMethodForBasket:(NSTimer*)timer {
+    int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
+    [self.Products setProductValues:pageNum direction:[timer userInfo]];
+    [self setStockInfoLabel:pageNum];
+}
+
 - (IBAction)basketDec:(id)sender {
+    int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
+    [self.Products setProductValues:pageNum direction:@"DOWN"];
+    [self setStockInfoLabel:pageNum];
+    repeatTimer = [NSTimer scheduledTimerWithTimeInterval:0.2
+                                                   target:self
+                                                 selector:@selector(timerMethodForBasket:)
+                                                 userInfo:@"DOWN"
+                                                  repeats:YES];
 }
 
 - (IBAction)basketInc:(id)sender {
+    int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
+    [self.Products setProductValues:pageNum direction:@"UP"];
+    [self setStockInfoLabel:pageNum];
+    repeatTimer = [NSTimer scheduledTimerWithTimeInterval:0.2
+                                                   target:self
+                                                 selector:@selector(timerMethodForBasket:)
+                                                 userInfo:@"UP"
+                                                  repeats:YES];
+}
+
+- (IBAction)basketIncEnded:(id)sender {
+    [repeatTimer invalidate];
+    repeatTimer = nil;
+}
+
+- (IBAction)basketDecEnded:(id)sender {
+    [repeatTimer invalidate];
+    repeatTimer = nil;
 }
 
 
@@ -176,9 +158,18 @@
     self.itemInfoCont.hidden = NO;
     self.CategoryName.text = menuName;
     [menuAct stopAnimating];
+    [self.Products getBasketInfoFromDict:menuName];
+    [self setStockInfoLabel:0];
     [self.scrollView addProductsToView:self.Products.products];
-    //[self.basketView refreshBasketView:[self.Products getProductForm:1 andPos:0] withNum:1];
     [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
+    
+}
+
+#pragma mark - ScrollView Delegates
+
+-(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
+    [self setStockInfoLabel:pageNum];
 }
 
 #pragma mark - TableView DataSource Methods
@@ -186,6 +177,7 @@
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if ([tableVersion isEqualToString:@"Login"]) return 1;
     if ([tableVersion isEqualToString:@"Menu"]) return 3;
+    if ([tableVersion isEqualToString:@"Basket"]) return 2;
     return 0;
 }
 
@@ -196,7 +188,24 @@
         if (section == 1) return 1;
         if (section == 2) return 1;
     }
+    if ([tableVersion isEqualToString:@"Basket"]) {
+        if (section == 0) return [self.Products.basket count] + 1;
+        if (section == 1) {
+            if ([self.Products.basket count] == 0) {
+                return 1;
+            } else {
+                return 2;
+            }
+        }
+    }
     return 0;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([tableVersion isEqualToString:@"Basket"] && indexPath.section == 0 && indexPath.row > 0) {
+        return 76.0f;
+    }
+    return 44.0f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -256,6 +265,61 @@
         }
     }
     
+    if ([tableVersion isEqualToString:@"Basket"]) {
+        if (indexPath.section == 0) {
+            if (indexPath.row == 0) {
+                static NSString *cellIdentifier = @"SummCell";
+                BYCellPrototypeBasket *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+                if (cell == nil) {
+                    cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+                }
+                if ([self.Products.basket count] == 0) {
+                    cell.itemName.text = @"Az Ön kosara üres";
+                } else {
+                    cell.itemName.text = [NSString stringWithFormat:@"Összesen: %d db",[self.Products BasketItemsSumm]];
+                }
+                return cell;
+            } else {
+                static NSString *cellIdentifier = @"ItemDetailsCell";
+                BYCellPrototypeBasket *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+                if (cell == nil) {
+                    cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+                }
+                BYProduct *cellProduct = [self.Products.basket objectForKey:[self.Products.allBasketKeys objectAtIndex:indexPath.row-1]];
+                cell.itemName.text = cellProduct.CategoryName;
+                NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:cellProduct.imageURL]];
+                cell.itemPic.image = [UIImage imageWithData:imageData];
+                cell.itemPieces.text = [NSString stringWithFormat:@"%d db",cellProduct.basket];
+                return cell;
+            }
+        }
+        if (indexPath.section == 1 && [self.Products.basket count] == 0) {
+            static NSString *cellIdentifier = @"BackCell";
+            BYCellPrototypeBasket *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+            if (cell == nil) {
+                cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            }
+            return cell;
+        } else {
+            if (indexPath.row == 0) {
+                static NSString *cellIdentifier = @"PlaceOrderCell";
+                BYCellPrototypeBasket *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+                if (cell == nil) {
+                    cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+                }
+                return cell;
+            } else {
+                static NSString *cellIdentifier = @"BackCell";
+                BYCellPrototypeBasket *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+                if (cell == nil) {
+                    cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+                }
+                return cell;
+            }
+        }
+        
+    }
+    
     return nil;
 }
 
@@ -273,6 +337,7 @@
             [loginAct startAnimating];
             [self.view endEditing:YES];
         }
+        return;
     }
     if ([tableVersion isEqualToString:@"Menu"]) {
         if (indexPath.row == 0 && indexPath.section == 2) {
@@ -289,6 +354,27 @@
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             [self.Products getMenuContents:indexPath.row];
         }
+        if (indexPath.section == 1) {
+            BYCellPrototypeMenu *clickedCell = (BYCellPrototypeMenu*)[tableView cellForRowAtIndexPath:indexPath];
+            [clickedCell.menuItemsLoading startAnimating];
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            tableVersion = @"Basket";
+            [self.tableViewCont reloadData];
+            [clickedCell.menuItemsLoading stopAnimating];
+        }
+        return;
+    }
+    if ([tableVersion isEqualToString:@"Basket"]) {
+        if ([[[tableView cellForRowAtIndexPath:indexPath] reuseIdentifier] isEqualToString:@"BackCell"]) {
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            tableVersion = @"Menu";
+            [self.tableViewCont reloadData];
+        }
+        if ([[[tableView cellForRowAtIndexPath:indexPath] reuseIdentifier] isEqualToString:@"PlaceOrderCell"]) {
+            [self.Products PlaceOrder];
+            [self.tableViewCont reloadData];
+        }
+        return;
     }
 }
 

@@ -11,14 +11,11 @@
 #import "BYProductImagesScrollView.h"
 #import "BYBasketView.h"
 
-@interface BYRootViewController : UIViewController <BYProductFactoryDelegate, UIScrollViewDelegate, AddBasketProtocol, UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDataSource, UITableViewDelegate>
+@interface BYRootViewController : UIViewController <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) BYProductFactory* Products;
 
 @property (nonatomic, strong) BYProductImagesScrollView* scrollView;
-@property (nonatomic, strong) BYBasketView* basketView;
-//@property (nonatomic, strong) BYBasketListViewController* basketListView;
-@property (nonatomic, strong) UIPickerView* piecesPicker;
 
 @property (nonatomic, strong) NSMutableArray* actualPieces;
 
@@ -43,6 +40,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *basketInfo;
 - (IBAction)basketDec:(id)sender;
 - (IBAction)basketInc:(id)sender;
+- (IBAction)basketIncEnded:(id)sender;
+- (IBAction)basketDecEnded:(id)sender;
 
 
 @end

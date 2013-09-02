@@ -10,8 +10,8 @@ NSString*(^createKey)(NSString*,NSString*) = ^(NSString* collection,NSString* su
     return [NSString stringWithFormat:@"%@ - %@",collection,subCol];
 };
 
-NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
-    return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d}", menuId, colorId];
+NSString*(^createJSONRequest)(int,int,int) = ^(int menuId,int colorId, int userId) {
+    return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d, \"userid\":%d}", menuId, colorId, userId];
 };
 
 NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
@@ -30,6 +30,8 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     NSString* actualMenu;
     NSString* actualName;
     int actualMenuId;
+    int userId;
+    NSString* userPwd;
     NSMutableString* imagesBaseHref;
 
     int actualCollection;
@@ -56,12 +58,13 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
 #pragma mark - Login Methods
 
 -(void)authLoginName:(NSString *)usr withPass:(NSString *)pass {
+    userPwd = pass;
     URLMethod = @"Login";
     usrName = usr;
     self.loginMessage = @"";
     if ([pass length] == 0) pass = @"__empty";
 
-    if ([self setConnection:@"auth" withPostName:@"pwd" andPostValue:pass]) {
+    if ([self setConnection:@"auth" withPostName:@"pwd" andPostValue:userPwd]) {
         receivedData = [NSMutableData data];
         imagesBaseHref = [NSMutableString string];
         actualCollection = 1;
@@ -69,6 +72,17 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
         self.menus = [NSMutableArray array];
         self.basket = [NSMutableDictionary dictionary];
         self.allBasketKeys = [NSArray array];
+    }
+}
+
+-(void)refreshMenu {
+    URLMethod = @"Login";
+    if ([self setConnection:@"auth" withPostName:@"pwd" andPostValue:userPwd]) {
+        receivedData = [NSMutableData data];
+        imagesBaseHref = [NSMutableString string];
+        actualCollection = 1;
+        actualImage = 1;
+        self.menus = [NSMutableArray array];
     }
 }
 
@@ -189,6 +203,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:postData];
+    [request setTimeoutInterval:10.0f];
     
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     
@@ -207,6 +222,11 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     NSDictionary* headers = [httpResponse allHeaderFields];
     if ([headers objectForKey:@"Content-Length"] > 0 && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text/xml"]) {
         receivedData.length = 0;
+        if ([URLMethod isEqualToString:@"Login"]) {
+            self.loginMessage = @"Hibás felhasználónév vagy jelszó!";
+            self.loginMessageColor = [UIColor redColor];
+            [self.delegate loginDidFinish];
+        }
     } else {
         [connection cancel];
     }
@@ -232,6 +252,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
             self.loginMessageColor = [UIColor redColor];
             [parser abortParsing];
             [self.delegate loginDidFinish];
+            NSLog(@"it");
         } else if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
             self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", usrName];
             self.loginMessageColor = [UIColor blackColor];
@@ -242,11 +263,12 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     if ([elementName isEqualToString:@"menu"]) {
         actualMenu = [attributeDict objectForKey:@"name"];
         actualMenuId = [[attributeDict objectForKey:@"menuId"] intValue];
+        userId = [[attributeDict objectForKey:@"userid"] intValue];
     }
     
     if ([elementName isEqualToString:@"sub"]) {
         [self registerMenu:createKey(actualMenu,[attributeDict objectForKey:@"name"])
-           withJSONRequest:createJSONRequest(actualMenuId,[[attributeDict objectForKey:@"colorId"] intValue])];
+           withJSONRequest:createJSONRequest(actualMenuId,[[attributeDict objectForKey:@"colorId"] intValue],userId)];
     }
     
     // Category values

@@ -22,6 +22,7 @@
 @interface BYProductFactory : NSObject <NSURLConnectionDataDelegate, NSURLConnectionDelegate, NSXMLParserDelegate>
 
 -(void)authLoginName:(NSString*)usr withPass:(NSString*)pass;
+-(void)refreshMenu;
 -(void)registerMenu:(NSString*)menuName withJSONRequest:(NSString*)request;
 
 -(void)registerProduct:(BYProduct*)product;

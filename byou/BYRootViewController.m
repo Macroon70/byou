@@ -23,7 +23,6 @@
     UIActivityIndicatorView* menuAct;
     NSString* menuName;
     NSString* tableVersion;
-    
     NSTimer* repeatTimer;
 }
 
@@ -82,6 +81,7 @@
     self.CategoryCont.hidden = YES;
     self.itemInfoCont.hidden = YES;
     [self.Products sendBasketInfoToDict:menuName];
+    [self.Products refreshMenu];
     [self.scrollView removeFromSuperview];
 }
 
@@ -137,7 +137,6 @@
     repeatTimer = nil;
 }
 
-
 #pragma mark - Factory Delegates
 
 -(void)loginDidFinish {
@@ -151,21 +150,27 @@
 }
 
 -(void)collectionDidFinish {
-    self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 56.0f, self.view.bounds.size.width, self.view.bounds.size.height - 56.0f)];
-    self.scrollView.delegate = self;
-    self.back_button.hidden = NO;
-    self.CategoryCont.hidden = NO;
-    self.itemInfoCont.hidden = NO;
-    self.CategoryName.text = menuName;
+    if ([self.Products.products count] != 0) {
+        self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 56.0f, self.view.bounds.size.width, self.view.bounds.size.height - 56.0f)];
+        self.scrollView.delegate = self;
+        self.back_button.hidden = NO;
+        self.CategoryCont.hidden = NO;
+        self.itemInfoCont.hidden = NO;
+        self.CategoryName.text = menuName;
+        [self.Products getBasketInfoFromDict:menuName];
+        [self setStockInfoLabel:0];
+        [self.scrollView addProductsToView:self.Products.products];
+        [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
+    }
     [menuAct stopAnimating];
-    [self.Products getBasketInfoFromDict:menuName];
-    [self setStockInfoLabel:0];
-    [self.scrollView addProductsToView:self.Products.products];
-    [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
-    
 }
 
 #pragma mark - ScrollView Delegates
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
+    [self setStockInfoLabel:pageNum];
+}
 
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
     int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);

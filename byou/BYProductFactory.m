@@ -10,8 +10,8 @@ NSString*(^createKey)(NSString*,NSString*) = ^(NSString* collection,NSString* su
     return [NSString stringWithFormat:@"%@ - %@",collection,subCol];
 };
 
-NSString*(^createJSONRequest)(int,int,int) = ^(int menuId,int colorId, int userId) {
-    return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d, \"userid\":%d}", menuId, colorId, userId];
+NSString*(^createJSONRequest)(int,int) = ^(int menuId,int colorId) {
+    return [NSString stringWithFormat:@"{\"menuId\":%d, \"colorId\":%d}", menuId, colorId];
 };
 
 NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
@@ -178,7 +178,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
         JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d},",JSONrequest,obj.ID,obj.basket];
     }];
     JSONrequest = [JSONrequest substringToIndex:[JSONrequest length] -1];
-    JSONrequest = [NSString stringWithFormat:@"%@]}",JSONrequest];
+    JSONrequest = [NSString stringWithFormat:@"%@],\"userid\":%d}",JSONrequest,userId];
     NSLog(@"%@",JSONrequest);
     if ([self setConnection:@"get" withPostName:@"json" andPostValue:JSONrequest]) {
         self.products = [NSMutableArray array];
@@ -268,7 +268,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     
     if ([elementName isEqualToString:@"sub"]) {
         [self registerMenu:createKey(actualMenu,[attributeDict objectForKey:@"name"])
-           withJSONRequest:createJSONRequest(actualMenuId,[[attributeDict objectForKey:@"colorId"] intValue],userId)];
+           withJSONRequest:createJSONRequest(actualMenuId,[[attributeDict objectForKey:@"colorId"] intValue])];
     }
     
     // Category values

@@ -24,6 +24,7 @@
     NSString* menuName;
     NSString* tableVersion;
     NSTimer* repeatTimer;
+    int isPlaceOrder;
 }
 
 @synthesize Products;
@@ -41,6 +42,7 @@
     self.Products = [[BYProductFactory alloc] init];
     self.Products.delegate = self;
     tableVersion = @"Login";
+    isPlaceOrder = 0;
 }
 
 
@@ -279,7 +281,12 @@
                     cell = (BYCellPrototypeBasket*)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
                 }
                 if ([self.Products.basket count] == 0) {
-                    cell.itemName.text = @"Az Ön kosara üres";
+                    if (isPlaceOrder == 0) {
+                        cell.itemName.text = @"Az Ön kosara üres";
+                    } else {
+                        cell.itemName.text = @"Rendelése sikeresen elküldve";
+                        isPlaceOrder = 0;
+                    }
                 } else {
                     cell.itemName.text = [NSString stringWithFormat:@"Összesen: %d db",[self.Products BasketItemsSumm]];
                 }
@@ -376,6 +383,7 @@
             [self.tableViewCont reloadData];
         }
         if ([[[tableView cellForRowAtIndexPath:indexPath] reuseIdentifier] isEqualToString:@"PlaceOrderCell"]) {
+            isPlaceOrder = 1;
             [self.Products PlaceOrder];
             [self.tableViewCont reloadData];
         }

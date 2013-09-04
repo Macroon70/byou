@@ -175,15 +175,15 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     URLMethod = @"PlaceOrder";
     __block NSString *JSONrequest = @"{\"order\":[";
     [self.basket enumerateKeysAndObjectsUsingBlock:^(id key, BYProduct* obj, BOOL *stop) {
-        JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d},",JSONrequest,obj.ID,obj.basket];
+        JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d,\"userid\":%d},",JSONrequest,obj.ID,obj.basket,userId];
     }];
     JSONrequest = [JSONrequest substringToIndex:[JSONrequest length] -1];
-    JSONrequest = [NSString stringWithFormat:@"%@],\"userid\":%d}",JSONrequest,userId];
+    JSONrequest = [NSString stringWithFormat:@"%@]}",JSONrequest];
     NSLog(@"%@",JSONrequest);
     if ([self setConnection:@"get" withPostName:@"json" andPostValue:JSONrequest]) {
         self.products = [NSMutableArray array];
     }
-    self.basket = [NSMutableArray array];
+    [self.basket removeAllObjects];
     self.allBasketKeys = [NSArray array];
     
 }

@@ -159,7 +159,7 @@
         self.CategoryCont.hidden = NO;
         self.itemInfoCont.hidden = NO;
         self.CategoryName.text = menuName;
-        [self.Products getBasketInfoFromDict:menuName];
+        if ([self.Products.basket count] > 0)[self.Products getBasketInfoFromDict:menuName];
         [self setStockInfoLabel:0];
         [self.scrollView addProductsToView:self.Products.products];
         [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];

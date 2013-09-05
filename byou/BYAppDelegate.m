@@ -19,6 +19,7 @@
 //    BYRootViewController* rootView = [[BYRootViewController alloc] init];
 //    self.window.rootViewController = rootView;
 //    [self.window makeKeyAndVisible];
+    [NSThread sleepForTimeInterval:2.0f];
     return YES;
 }
 

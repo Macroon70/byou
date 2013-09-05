@@ -223,7 +223,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     if ([headers objectForKey:@"Content-Length"] > 0 && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text/xml"]) {
         receivedData.length = 0;
         if ([URLMethod isEqualToString:@"Login"]) {
-            self.loginMessage = @"Hibás felhasználónév vagy jelszó!";
+            self.loginMessage = @"Hibás jelszó!";
             self.loginMessageColor = [UIColor redColor];
             [self.delegate loginDidFinish];
         }
@@ -248,13 +248,16 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     // Auth node
     if ([elementName isEqualToString:@"result"]) {
         if ([[attributeDict objectForKey:@"status"] isEqualToString:@"no"]) {
-            self.loginMessage = @"Hibás felhasználónév vagy jelszó!";
+            self.loginMessage = @"Hibás jelszó!";
             self.loginMessageColor = [UIColor redColor];
             [parser abortParsing];
             [self.delegate loginDidFinish];
             NSLog(@"it");
         } else if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
-            self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", usrName];
+            userId = [[attributeDict objectForKey:@"userid"] intValue];
+            NSLog(@"%@",[attributeDict objectForKey:@"username"]);
+            usrName = [NSString stringWithFormat:@"%@",[attributeDict objectForKey:@"username"]];
+            self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", [attributeDict objectForKey:@"username"]];
             self.loginMessageColor = [UIColor blackColor];
         }
     }
@@ -263,7 +266,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     if ([elementName isEqualToString:@"menu"]) {
         actualMenu = [attributeDict objectForKey:@"name"];
         actualMenuId = [[attributeDict objectForKey:@"menuId"] intValue];
-        userId = [[attributeDict objectForKey:@"userid"] intValue];
+        //userId = [[attributeDict objectForKey:@"userid"] intValue];
     }
     
     if ([elementName isEqualToString:@"sub"]) {

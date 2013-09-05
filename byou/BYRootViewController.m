@@ -189,7 +189,7 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if ([tableVersion isEqualToString:@"Login"]) return 3;
+    if ([tableVersion isEqualToString:@"Login"]) return 2;
     if ([tableVersion isEqualToString:@"Menu"]) {
         if (section == 0) return [self.Products.menus count];
         if (section == 1) return 1;
@@ -218,7 +218,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([tableVersion isEqualToString:@"Login"]) {
-        if (indexPath.row == 2) {
+        if (indexPath.row == 1) {
             static NSString *cellIndetifier = @"LoginSend";
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifier forIndexPath:indexPath];
             loginAct = (UIActivityIndicatorView*)[cell viewWithTag:1];
@@ -229,7 +229,8 @@
             if (cell == nil) {
                 cell = [[BYCellPrototypeLogin alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
-    
+            
+            /*
             switch (indexPath.row) {
                 case 0:
                     cell.label.text = @"Felhasználó";
@@ -238,6 +239,11 @@
                     cell.label.text = @"Jelszó";
                     cell.aTextField.secureTextEntry = YES;
                     break;
+            }
+             */
+            if (indexPath.row == 0) {
+                cell.label.text = @"Jelszó";
+                cell.aTextField.secureTextEntry = YES;
             }
             return cell;
         }
@@ -339,13 +345,13 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([tableVersion isEqualToString:@"Login"]) {
-        if (indexPath.row == 2) {
+        if (indexPath.row == 1) {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
-            BYCellPrototypeLogin *cellAuth = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:indexPath.section]];
-            BYCellPrototypeLogin *cellName = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
-            [self.Products authLoginName:cellName.aTextField.text withPass:cellAuth.aTextField.text];
+            BYCellPrototypeLogin *cellAuth = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
+            //BYCellPrototypeLogin *cellName = (BYCellPrototypeLogin *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
+            [self.Products authLoginName:@"" withPass:cellAuth.aTextField.text];
             cellAuth.aTextField.text = @"";
-            cellName.aTextField.text = @"";
+            //cellName.aTextField.text = @"";
             [loginAct startAnimating];
             [self.view endEditing:YES];
         }

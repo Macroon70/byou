@@ -10,6 +10,8 @@
 
 @implementation BYCellPrototypeOrder
 
+@synthesize oriValue, newValue;
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -26,4 +28,17 @@
     // Configure the view for the selected state
 }
 
+- (IBAction)orderCollectionUp:(id)sender {
+    if (self.oriValue > self.newValue) {
+        self.itemPiecesChecked.text = [NSString stringWithFormat:@"%d db",++self.newValue];
+        [self.delegate valueChanged:self.orderId withNewValue:self.newValue];
+    }
+}
+
+- (IBAction)orderCollectionDown:(id)sender {
+    if (self.newValue > 0) {
+        self.itemPiecesChecked.text = [NSString stringWithFormat:@"%d db",--self.newValue];
+        [self.delegate valueChanged:self.orderId withNewValue:self.newValue];
+    }
+}
 @end

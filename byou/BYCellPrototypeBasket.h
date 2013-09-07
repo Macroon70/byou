@@ -8,9 +8,27 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol ByCellPrototypeBasketDelegate
+
+-(void)valueChangedBasket:(NSString*)itemId withNewValue:(int)newValue;
+
+@end
+
 @interface BYCellPrototypeBasket : UITableViewCell
+
+@property (weak, nonatomic) id<ByCellPrototypeBasketDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UILabel *itemName;
 @property (weak, nonatomic) IBOutlet UIImageView *itemPic;
+@property (weak, nonatomic) IBOutlet UILabel *itemNo;
 @property (weak, nonatomic) IBOutlet UILabel *itemPieces;
+@property (weak, nonatomic) IBOutlet UILabel *itemPrice;
+@property (weak, nonatomic) IBOutlet UILabel *itemSummPrice;
+@property int itemNum;
+@property int maxItemNum;
+@property (strong, nonatomic) NSString* productId;
+@property long oriItemPrice;
+@property long oriItemSummPrice;
+- (IBAction)addMoreItem:(id)sender;
+- (IBAction)leftMoreItem:(id)sender;
 
 @end

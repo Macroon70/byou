@@ -10,4 +10,14 @@
 
 @interface BYOrder : NSObject
 
+@property (nonatomic, retain) NSString* itemCategory;
+@property (nonatomic, retain) NSString* itemNo;
+@property int itemId;
+@property (nonatomic, retain) NSString* itemImg;
+@property int itemPrice;
+@property int itemQuantity;
+@property int itemQuantityRel;
+@property int state;
+@property int orderId;
+
 @end

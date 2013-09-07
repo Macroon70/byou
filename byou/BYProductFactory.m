@@ -18,6 +18,15 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     return [NSString stringWithFormat:@"%@ - %d",collection,ID];
 };
 
+NSString*(^thousandSeparate3)(int) = ^(int number) {
+    NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
+    [formatter setGroupingSeparator:@" "];
+    [formatter setGroupingSize:3];
+    [formatter setUsesGroupingSeparator:YES];
+    return [formatter stringFromNumber:[NSNumber numberWithInt:number]];
+};
+
+
 #define REQUEST_URL @"http://w0rkz.exceex.hu/byouWarehouse/"
 
 #import "BYProductFactory.h"
@@ -31,9 +40,8 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     NSString* actualName;
     int actualMenuId;
     int userId;
-    NSString* userPwd;
+    NSString* actualOrder;
     NSMutableString* imagesBaseHref;
-
     int actualCollection;
     int actualImage;
 }
@@ -45,6 +53,10 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
 @synthesize menus;
 @synthesize basket;
 @synthesize allBasketKeys;
+@synthesize usrMode;
+@synthesize orders;
+@synthesize actualOrderItems;
+@synthesize userPwd;
 
 #pragma mark - Init methods
 
@@ -58,7 +70,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
 #pragma mark - Login Methods
 
 -(void)authLoginName:(NSString *)usr withPass:(NSString *)pass {
-    userPwd = pass;
+    self.userPwd = pass;
     URLMethod = @"Login";
     usrName = usr;
     self.loginMessage = @"";
@@ -69,8 +81,11 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
         imagesBaseHref = [NSMutableString string];
         actualCollection = 1;
         actualImage = 1;
+        actualOrder = [NSString string];
+        self.actualOrderItems = [NSMutableArray array];
         self.menus = [NSMutableArray array];
         self.basket = [NSMutableDictionary dictionary];
+        self.orders = [NSMutableDictionary dictionary];
         self.allBasketKeys = [NSArray array];
     }
 }
@@ -129,12 +144,13 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     }];
 }
 
--(int)BasketItemsSumm {
-    __block int itemsSumm = 0;
+-(NSString*)BasketItemsSumm {
+    __block int itemsSumm = 0, valueSumm = 0;
     [self.basket enumerateKeysAndObjectsUsingBlock:^(id key, BYProduct* obj, BOOL *stop) {
         itemsSumm += obj.basket;
+        valueSumm += obj.basket * obj.itemPrice;
     }];
-    return itemsSumm;
+    return [NSString stringWithFormat:@"Összesen: %d db, %@ Ft",itemsSumm,thousandSeparate3(valueSumm)];
 }
 
 #pragma mark - Menu methods
@@ -146,6 +162,10 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     if ([self setConnection:@"imgs" withPostName:@"getItems" andPostValue:collectMenuDetails.JSONRequest]) {
         self.products = [NSMutableArray array];
     }
+}
+
+-(void)getOrderContents:(NSString *)idx {
+    self.actualOrderItems = [self.orders objectForKey:idx];
 }
 
 -(void)registerProduct:(BYProduct *)product {
@@ -162,6 +182,7 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
         changingProduct.pieces ++;
     }
 }
+
 
 #pragma mark - Product Methods
 
@@ -187,6 +208,60 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     self.allBasketKeys = [NSArray array];
     
 }
+
+#pragma mark - Order Methods
+
+-(void)addOrder:(NSDictionary*)orderDeatils {
+    BYOrder* tempOrder = [[BYOrder alloc] init];
+    tempOrder.itemCategory = [orderDeatils objectForKey:@"category"];
+    tempOrder.itemNo = [orderDeatils objectForKey:@"cikkszam"];
+    tempOrder.itemId = [[orderDeatils objectForKey:@"id"] intValue];
+    tempOrder.itemImg = [orderDeatils objectForKey:@"img"];
+    tempOrder.itemPrice = [[orderDeatils objectForKey:@"price"] intValue];
+    tempOrder.itemQuantity = [[orderDeatils objectForKey:@"qty"] intValue];
+    tempOrder.itemQuantityRel = tempOrder.itemQuantity;
+    tempOrder.state = 0;
+    tempOrder.orderId = [actualOrder intValue];
+    NSString* idxName = [NSString stringWithFormat:@"Rendelés - %@", actualOrder];
+    if ([[self.orders allKeys] containsObject:idxName]) {
+        NSMutableArray* tempArray = [self.orders objectForKey:idxName];
+        [tempArray addObject:tempOrder];
+        [self.orders setObject:tempArray forKey:idxName];
+    } else {
+        NSMutableArray* tempArray = [NSMutableArray arrayWithObject:tempOrder];
+        [self.orders setObject:tempArray forKey:idxName];
+    }
+    NSLog(@"%@",self.orders);
+}
+
+-(int)OrderItemSumm {
+    __block int summ = 0;
+    [self.actualOrderItems enumerateObjectsUsingBlock:^(BYOrder* obj, NSUInteger idx, BOOL *stop) {
+        summ += obj.itemQuantityRel;
+    }];
+    return summ;
+}
+
+-(void)collectedOrder {
+    URLMethod = @"PlaceOrder";
+    __block NSString *JSONrequest = @"{\"collOrder\":[";
+    __block int aId;
+    [self.actualOrderItems enumerateObjectsUsingBlock:^(BYOrder* obj, NSUInteger idx, BOOL *stop) {
+        JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d,\"colldb\":%d,\"userid\":%d,\"buyId\":%d},",
+                       JSONrequest,obj.itemId,obj.itemQuantity,obj.itemQuantityRel,userId,obj.orderId];
+        aId = obj.orderId;
+
+    }];
+    JSONrequest = [JSONrequest substringToIndex:[JSONrequest length] -1];
+    JSONrequest = [NSString stringWithFormat:@"%@]}",JSONrequest];
+    NSString* deleteOrder = [NSString stringWithFormat:@"Rendelés - %d",aId];
+    NSLog(@"%@",JSONrequest);
+    if ([self setConnection:@"confirm" withPostName:@"json" andPostValue:JSONrequest]) {
+        [self.actualOrderItems removeAllObjects];
+        [self.orders removeObjectForKey:deleteOrder];
+    }
+}
+
 
 #pragma mark - URlConnection methods
 
@@ -221,8 +296,9 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     NSDictionary* headers = [httpResponse allHeaderFields];
     if ([headers objectForKey:@"Content-Length"] > 0 && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text/xml"]) {
+        NSLog(@"%@",headers);
         receivedData.length = 0;
-        if ([URLMethod isEqualToString:@"Login"]) {
+        if ([[headers objectForKey:@"Content-Length"] intValue] == 37 && [URLMethod isEqualToString:@"Login"]) {
             self.loginMessage = @"Hibás jelszó!";
             self.loginMessageColor = [UIColor redColor];
             [self.delegate loginDidFinish];
@@ -244,21 +320,18 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
 #pragma mark - XMLParser delegates
 
 -(void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
-
+    
+    NSLog(@"%@",elementName);
+    NSLog(@"%@",attributeDict);
+    
     // Auth node
     if ([elementName isEqualToString:@"result"]) {
-        if ([[attributeDict objectForKey:@"status"] isEqualToString:@"no"]) {
-            self.loginMessage = @"Hibás jelszó!";
-            self.loginMessageColor = [UIColor redColor];
-            [parser abortParsing];
-            [self.delegate loginDidFinish];
-            NSLog(@"it");
-        } else if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
-            userId = [[attributeDict objectForKey:@"userid"] intValue];
-            NSLog(@"%@",[attributeDict objectForKey:@"username"]);
-            usrName = [NSString stringWithFormat:@"%@",[attributeDict objectForKey:@"username"]];
-            self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", [attributeDict objectForKey:@"username"]];
-            self.loginMessageColor = [UIColor blackColor];
+        if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
+           userId = [[attributeDict objectForKey:@"userid"] intValue];
+           usrName = [NSString stringWithFormat:@"%@",[attributeDict objectForKey:@"username"]];
+           self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", [attributeDict objectForKey:@"username"]];
+           self.loginMessageColor = [UIColor blackColor];
+           self.usrMode = [[attributeDict objectForKey:@"mode"] intValue];
         }
     }
     
@@ -266,7 +339,6 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
     if ([elementName isEqualToString:@"menu"]) {
         actualMenu = [attributeDict objectForKey:@"name"];
         actualMenuId = [[attributeDict objectForKey:@"menuId"] intValue];
-        //userId = [[attributeDict objectForKey:@"userid"] intValue];
     }
     
     if ([elementName isEqualToString:@"sub"]) {
@@ -285,14 +357,35 @@ NSString*(^createKeyForBasket)(NSString*,int) = ^(NSString* collection,int ID) {
         tempProduct.pieces = [[attributeDict objectForKey:@"DB"] intValue];
         tempProduct.imageURL = [NSString stringWithFormat:@"%@/%@",imagesBaseHref,[attributeDict objectForKey:@"SRC"]];
         tempProduct.ID = [[attributeDict objectForKey:@"ITEMID"] intValue];
+        if ([[attributeDict objectForKey:@"PRICE"] length] != 0) {
+            tempProduct.itemPrice = [[attributeDict objectForKey:@"PRICE"] intValue];
+        }
+        tempProduct.itemSummPrice = tempProduct.itemPrice * tempProduct.pieces;
+        tempProduct.itemNo = [NSString stringWithFormat:@"%@", [attributeDict objectForKey:@"CIKKSZAM"]];
         [self registerProduct:tempProduct];
         actualImage ++;
     }
+    
+    // Orders
+    if ([elementName isEqualToString:@"order"]) {
+        actualOrder = (NSString*)[attributeDict objectForKey:@"id"];
+    }
+    
+    if ([elementName isEqualToString:@"item"]) {
+        [self addOrder:attributeDict];
+    }
+    
 }
 
 -(void)parserDidEndDocument:(NSXMLParser *)parser {
+    NSLog(@"Parse end");
     if ([URLMethod isEqualToString:@"Login"]) [self.delegate loginDidFinish];
     if ([URLMethod isEqualToString:@"Collection"]) [self.delegate collectionDidFinish];
+}
+
+-(void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError {
+    NSLog(@"Parser error: %@", parseError);
+    if ([URLMethod isEqualToString:@"Login"]) [self.delegate loginDidFinish];
 }
 
 @end

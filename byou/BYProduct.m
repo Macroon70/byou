@@ -13,6 +13,7 @@
 -(id)init {
     if (self == [super init]) {
         self.basket = 0;
+        self.itemPrice = 0;
     }
     return self;
 }

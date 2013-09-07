@@ -10,8 +10,11 @@
 #import "BYProductFactory.h"
 #import "BYProductImagesScrollView.h"
 #import "BYBasketView.h"
+#import "BYCellPrototypeOrder.h"
+#import "BYCellPrototypeBasket.h"
 
-@interface BYRootViewController : UIViewController <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface BYRootViewController : UIViewController
+    <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, ByCellPrototypeOrderDelegate, ByCellPrototypeBasketDelegate>
 
 @property (nonatomic, strong) BYProductFactory* Products;
 
@@ -42,6 +45,5 @@
 - (IBAction)basketInc:(id)sender;
 - (IBAction)basketIncEnded:(id)sender;
 - (IBAction)basketDecEnded:(id)sender;
-
 
 @end

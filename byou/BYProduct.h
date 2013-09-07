@@ -13,6 +13,9 @@
 @property (nonatomic, strong) NSMutableString* imageURL;
 @property (nonatomic, strong) NSString* CategoryName;
 @property int ID;
+@property long itemPrice;
+@property long itemSummPrice;
+@property (nonatomic, retain) NSString* itemNo;
 @property int pieces;
 @property int basket;
 

@@ -20,6 +20,8 @@
 		DB5BAB9017C6619B0025B4E0 /* BYCellPrototypeBasket.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5BAB8F17C6619B0025B4E0 /* BYCellPrototypeBasket.m */; };
 		DB63CB3817C0DB55004C2FDC /* iPadStoryBoard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */; };
 		DB9C243C17C0EC1400A79C35 /* BYCellPrototypeLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */; };
+		DBAA09EB17DB2D35009860DE /* BYOrder.m in Sources */ = {isa = PBXBuildFile; fileRef = DBAA09EA17DB2D35009860DE /* BYOrder.m */; };
+		DBAA09EE17DB3A41009860DE /* BYCellPrototypeOrder.m in Sources */ = {isa = PBXBuildFile; fileRef = DBAA09ED17DB3A41009860DE /* BYCellPrototypeOrder.m */; };
 		DBD33D9417B7C4AF0081B999 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9317B7C4AF0081B999 /* UIKit.framework */; };
 		DBD33D9617B7C4AF0081B999 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9517B7C4AF0081B999 /* Foundation.framework */; };
 		DBD33D9817B7C4AF0081B999 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD33D9717B7C4AF0081B999 /* CoreGraphics.framework */; };
@@ -54,6 +56,10 @@
 		DB63CB3717C0DB55004C2FDC /* iPadStoryBoard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = iPadStoryBoard.storyboard; sourceTree = "<group>"; };
 		DB9C243A17C0EC1400A79C35 /* BYCellPrototypeLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BYCellPrototypeLogin.h; path = ../BYCellPrototypeLogin.h; sourceTree = "<group>"; };
 		DB9C243B17C0EC1400A79C35 /* BYCellPrototypeLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BYCellPrototypeLogin.m; path = ../BYCellPrototypeLogin.m; sourceTree = "<group>"; };
+		DBAA09E917DB2D34009860DE /* BYOrder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BYOrder.h; sourceTree = "<group>"; };
+		DBAA09EA17DB2D35009860DE /* BYOrder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYOrder.m; sourceTree = "<group>"; };
+		DBAA09EC17DB3A41009860DE /* BYCellPrototypeOrder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BYCellPrototypeOrder.h; sourceTree = "<group>"; };
+		DBAA09ED17DB3A41009860DE /* BYCellPrototypeOrder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BYCellPrototypeOrder.m; sourceTree = "<group>"; };
 		DBD33D9017B7C4AF0081B999 /* byou.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = byou.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD33D9317B7C4AF0081B999 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DBD33D9517B7C4AF0081B999 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -147,6 +153,8 @@
 				DBD33DB417B7D1440081B999 /* BYProduct.m */,
 				DB5BAB8217C54DDE0025B4E0 /* BYMenu.h */,
 				DB5BAB8317C54DDE0025B4E0 /* BYMenu.m */,
+				DBAA09E917DB2D34009860DE /* BYOrder.h */,
+				DBAA09EA17DB2D35009860DE /* BYOrder.m */,
 				DBD33DB617B7E9600081B999 /* BYRootViewController.h */,
 				DBD33DB717B7E9600081B999 /* BYRootViewController.m */,
 				DBD33DB917B7EB7C0081B999 /* BYProductImagesScrollView.h */,
@@ -159,6 +167,8 @@
 				DB5BAB8017C54C320025B4E0 /* BYCellPrototypeMenu.m */,
 				DB5BAB8E17C6619B0025B4E0 /* BYCellPrototypeBasket.h */,
 				DB5BAB8F17C6619B0025B4E0 /* BYCellPrototypeBasket.m */,
+				DBAA09EC17DB3A41009860DE /* BYCellPrototypeOrder.h */,
+				DBAA09ED17DB3A41009860DE /* BYCellPrototypeOrder.m */,
 				DB5BAB8717C63AD70025B4E0 /* images */,
 				DBD33D9A17B7C4AF0081B999 /* Supporting Files */,
 			);
@@ -265,6 +275,8 @@
 				DB5BAB8117C54C320025B4E0 /* BYCellPrototypeMenu.m in Sources */,
 				DB5BAB8417C54DDE0025B4E0 /* BYMenu.m in Sources */,
 				DB5BAB9017C6619B0025B4E0 /* BYCellPrototypeBasket.m in Sources */,
+				DBAA09EB17DB2D35009860DE /* BYOrder.m in Sources */,
+				DBAA09EE17DB3A41009860DE /* BYCellPrototypeOrder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

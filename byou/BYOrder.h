@@ -19,5 +19,6 @@
 @property int itemQuantityRel;
 @property int state;
 @property int orderId;
+@property NSString* orderDate;
 
 @end

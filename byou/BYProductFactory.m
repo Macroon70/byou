@@ -41,6 +41,7 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     int actualMenuId;
     int userId;
     NSString* actualOrder;
+    NSString* actualDate;
     NSMutableString* imagesBaseHref;
     int actualCollection;
     int actualImage;
@@ -220,8 +221,9 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     tempOrder.itemQuantity = [[orderDeatils objectForKey:@"qty"] intValue];
     tempOrder.itemQuantityRel = tempOrder.itemQuantity;
     tempOrder.state = 0;
+    tempOrder.orderDate = actualDate;
     tempOrder.orderId = [actualOrder intValue];
-    NSString* idxName = [NSString stringWithFormat:@"Rendelés - %@", actualOrder];
+    NSString* idxName = [NSString stringWithFormat:@"Rendelés - %@", tempOrder.orderDate];
     if ([[self.orders allKeys] containsObject:idxName]) {
         NSMutableArray* tempArray = [self.orders objectForKey:idxName];
         [tempArray addObject:tempOrder];
@@ -244,16 +246,16 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
 -(void)collectedOrder {
     URLMethod = @"PlaceOrder";
     __block NSString *JSONrequest = @"{\"collOrder\":[";
-    __block int aId;
+    __block NSString* aId;
     [self.actualOrderItems enumerateObjectsUsingBlock:^(BYOrder* obj, NSUInteger idx, BOOL *stop) {
         JSONrequest = [NSString stringWithFormat:@"%@{\"id\":%d,\"db\":%d,\"colldb\":%d,\"userid\":%d,\"buyId\":%d},",
                        JSONrequest,obj.itemId,obj.itemQuantity,obj.itemQuantityRel,userId,obj.orderId];
-        aId = obj.orderId;
+        aId = obj.orderDate;
 
     }];
     JSONrequest = [JSONrequest substringToIndex:[JSONrequest length] -1];
     JSONrequest = [NSString stringWithFormat:@"%@]}",JSONrequest];
-    NSString* deleteOrder = [NSString stringWithFormat:@"Rendelés - %d",aId];
+    NSString* deleteOrder = [NSString stringWithFormat:@"Rendelés - %@",aId];
     NSLog(@"%@",JSONrequest);
     if ([self setConnection:@"confirm" withPostName:@"json" andPostValue:JSONrequest]) {
         [self.actualOrderItems removeAllObjects];
@@ -368,6 +370,7 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     // Orders
     if ([elementName isEqualToString:@"order"]) {
         actualOrder = (NSString*)[attributeDict objectForKey:@"id"];
+        actualDate = (NSString*)[attributeDict objectForKey:@"date"];
     }
     
     if ([elementName isEqualToString:@"item"]) {

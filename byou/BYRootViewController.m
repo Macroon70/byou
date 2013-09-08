@@ -73,6 +73,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     [self setStockInfo:nil];
     [self setBasketInfo:nil];
     [self setItemInfoCont:nil];
+    [self setRefreshButton:nil];
     [super viewDidUnload];
 }
 
@@ -113,9 +114,14 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     self.back_button.hidden = YES;
     self.CategoryCont.hidden = YES;
     self.itemInfoCont.hidden = YES;
+    self.refreshButton.hidden = NO;
     [self.Products sendBasketInfoToDict:menuName];
     [self.Products refreshMenu];
     [self.scrollView removeFromSuperview];
+}
+
+- (IBAction)refreshPushed:(id)sender {
+    [self.Products authLoginName:@"" withPass:self.Products.userPwd];
 }
 
 - (IBAction)nextItem:(id)sender {
@@ -179,6 +185,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     if (![self.Products.loginMessage isEqualToString:@"Hibás jelszó!"]) {
         tableVersion = @"Menu";
         [self.tableViewCont reloadData];
+        self.refreshButton.hidden = NO;
     }
 }
 
@@ -196,6 +203,16 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
         [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
     }
     [menuAct stopAnimating];
+}
+
+#pragma mark - UITextFieldDelegates
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    [self.Products authLoginName:@"" withPass:textField.text];
+    textField.text = @"";
+    [loginAct startAnimating];
+    [self.view endEditing:YES];
+    return YES;
 }
 
 #pragma mark - ByCellOrderPrototype Delegates
@@ -309,6 +326,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
             if (cell == nil) {
                 cell = [[BYCellPrototypeLogin alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
             }
+            cell.aTextField.delegate = self;
             cell.label.text = @"Jelszó";
             cell.aTextField.secureTextEntry = YES;
             return cell;
@@ -346,13 +364,16 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
         } else if (self.Products.usrMode == 2) {
             if (indexPath.section == 0) {
                 if ([self.Products.orders count] != 0) {
+                    NSArray *keys = [self.Products.orders allKeys];
+                    NSArray *sortedKeys = [keys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+
                     static NSString *cellIdentifier = @"MenuCell";
                     BYCellPrototypeMenu *cell = (BYCellPrototypeMenu*)[tableView dequeueReusableCellWithIdentifier:cellIdentifier
                                                                                                   forIndexPath:indexPath];
                     if (cell == nil) {
                         cell = [[BYCellPrototypeMenu alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
                     }
-                    cell.menuName.text = [[self.Products.orders allKeys] objectAtIndex:indexPath.row];
+                    cell.menuName.text = [sortedKeys objectAtIndex:indexPath.row];
                     return cell;
                 } else {
                     static NSString *cellIdentifier = @"SummCell";
@@ -570,8 +591,10 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
             tableVersion = @"Login";
             [self.tableViewCont reloadData];
             self.statusLabel.text = @"";
+            self.refreshButton.hidden = YES;
         }
-        if (indexPath.section == 0) {
+        if (indexPath.section == 0 &&
+            ![[[tableView cellForRowAtIndexPath:indexPath] reuseIdentifier] isEqualToString:@"SummCell"]) {
             BYCellPrototypeMenu *clickedCell = (BYCellPrototypeMenu*)[tableView cellForRowAtIndexPath:indexPath];
             menuAct = clickedCell.menuItemsLoading;
             menuName = clickedCell.menuName.text;
@@ -585,6 +608,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                 tableVersion = @"Basket";
                 [self.tableViewCont reloadData];
             }
+            self.refreshButton.hidden = YES;
         }
         if (indexPath.section == 1 && self.Products.usrMode == 1) {
             BYCellPrototypeMenu *clickedCell = (BYCellPrototypeMenu*)[tableView cellForRowAtIndexPath:indexPath];
@@ -593,6 +617,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
             tableVersion = @"Basket";
             [self.tableViewCont reloadData];
             [clickedCell.menuItemsLoading stopAnimating];
+            self.refreshButton.hidden = YES;
         }
         return;
     }
@@ -623,6 +648,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             tableVersion = @"Menu";
             [self.tableViewCont reloadData];
+            self.refreshButton.hidden = NO;
         }
         if ([[[tableView cellForRowAtIndexPath:indexPath] reuseIdentifier] isEqualToString:@"PlaceOrderCell"]) {
             isPlaceOrder = 1;

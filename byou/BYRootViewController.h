@@ -14,7 +14,7 @@
 #import "BYCellPrototypeBasket.h"
 
 @interface BYRootViewController : UIViewController
-    <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, ByCellPrototypeOrderDelegate, ByCellPrototypeBasketDelegate>
+    <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, ByCellPrototypeOrderDelegate, ByCellPrototypeBasketDelegate, UITextFieldDelegate>
 
 @property (nonatomic, strong) BYProductFactory* Products;
 
@@ -34,6 +34,8 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *back_button;
 - (IBAction)back_pushed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *refreshButton;
+- (IBAction)refreshPushed:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *CategoryName;
 @property (weak, nonatomic) IBOutlet UIView *CategoryCont;
 - (IBAction)nextItem:(id)sender;

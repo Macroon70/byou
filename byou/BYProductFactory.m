@@ -70,12 +70,11 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
 #pragma mark - Login Methods
 
 -(void)authLoginName:(NSString *)usr withPass:(NSString *)pass {
-    self.userPwd = pass;
     URLMethod = @"Login";
     usrName = usr;
     self.loginMessage = @"";
     if ([pass length] == 0) pass = @"__empty";
-
+    self.userPwd = pass;
     if ([self setConnection:@"auth" withPostName:@"pwd" andPostValue:userPwd]) {
         receivedData = [NSMutableData data];
         imagesBaseHref = [NSMutableString string];
@@ -327,11 +326,11 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     // Auth node
     if ([elementName isEqualToString:@"result"]) {
         if ([[attributeDict objectForKey:@"status"] isEqualToString:@"yes"]) {
-           userId = [[attributeDict objectForKey:@"userid"] intValue];
-           usrName = [NSString stringWithFormat:@"%@",[attributeDict objectForKey:@"username"]];
-           self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", [attributeDict objectForKey:@"username"]];
-           self.loginMessageColor = [UIColor blackColor];
-           self.usrMode = [[attributeDict objectForKey:@"mode"] intValue];
+            userId = [[attributeDict objectForKey:@"userid"] intValue];
+            usrName = [NSString stringWithFormat:@"%@",[attributeDict objectForKey:@"username"]];
+            self.loginMessage = [NSString stringWithFormat:@"Bejelentkezve mint: %@", [attributeDict objectForKey:@"username"]];
+            self.loginMessageColor = [UIColor blackColor];
+            self.usrMode = [[attributeDict objectForKey:@"mode"] intValue];
         }
     }
     

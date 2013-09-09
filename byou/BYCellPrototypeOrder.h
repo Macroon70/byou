@@ -14,6 +14,7 @@
 
 -(void)valueChanged:(int)itemId withNewValue:(int)newValue;
 -(void)orderStateChanged:(int)itemId withNewValue:(int)newValue;
+-(void)showImageInBig:(NSString*)imgURL;
 
 @end
 
@@ -27,6 +28,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *itemNo;
 @property (weak, nonatomic) IBOutlet UILabel *itemPieces;
 @property (weak, nonatomic) IBOutlet UILabel *itemPiecesChecked;
+@property (nonatomic, strong) NSString* imgURL;
 @property int oriValue;
 @property int newValue;
 @property int orderId;

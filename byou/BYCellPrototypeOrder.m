@@ -21,12 +21,18 @@
     return self;
 }
 
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
 }
+
+-(void)imageTapped:(UITapGestureRecognizer*)gestureRecognizer {
+    [self.delegate showImageInBig:self.imgURL];
+}
+
 
 - (IBAction)orderCollectionUp:(id)sender {
     if (self.oriValue > self.newValue) {

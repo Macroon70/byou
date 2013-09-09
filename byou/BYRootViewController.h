@@ -21,6 +21,7 @@
 @property (nonatomic, strong) BYProductImagesScrollView* scrollView;
 
 @property (nonatomic, strong) NSMutableArray* actualPieces;
+@property (weak, nonatomic) IBOutlet UIImageView *itemBigPic;
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 #pragma mark -

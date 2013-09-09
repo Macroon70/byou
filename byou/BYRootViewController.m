@@ -52,6 +52,8 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     self.Products.delegate = self;
     tableVersion = @"Login";
     isPlaceOrder = 0;
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeBigPic:)];
+    [self.itemBigPic addGestureRecognizer:tap];
 }
 
 
@@ -176,6 +178,11 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     repeatTimer = nil;
 }
 
+
+-(void)closeBigPic:(UITapGestureRecognizer*)gestureRecognizer {
+    gestureRecognizer.view.hidden = YES;
+}
+
 #pragma mark - Factory Delegates
 
 -(void)loginDidFinish {
@@ -228,10 +235,15 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 -(void)orderStateChanged:(int)itemId withNewValue:(int)newValue {
     BYOrder* tempOrder = [self.Products.actualOrderItems objectAtIndex:itemId];
     tempOrder.state = newValue;
-    NSLog(@"itt");
 }
 
-#pragma mark - ByCellBasketPrototype Delegates 
+-(void)showImageInBig:(NSString *)imgURL {
+    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgURL]];
+    self.itemBigPic.image = [[UIImage alloc] initWithData:imageData];
+    self.itemBigPic.hidden = NO;
+}
+
+#pragma mark - ByCellBasketPrototype Delegates
 
 -(void)valueChangedBasket:(NSString*)itemId withNewValue:(int)newValue {
     BYProduct *cellProduct = [self.Products.basket objectForKey:itemId];
@@ -493,6 +505,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                     BYOrder *cellProduct = (BYOrder*)[self.Products.actualOrderItems objectAtIndex:indexPath.row -1];
                     orderSummCell.itemName.text = cellProduct.itemCategory;
                     NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:cellProduct.itemImg]];
+                    orderSummCell.imgURL = cellProduct.itemImg;
                     orderSummCell.itemPic.image = [UIImage imageWithData:imageData];
                     orderSummCell.itemPieces.text = [NSString stringWithFormat:@"%d db",cellProduct.itemQuantity];
                     orderSummCell.itemPiecesChecked.text = [NSString stringWithFormat:@"%d db",cellProduct.itemQuantityRel];
@@ -501,14 +514,20 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                     orderSummCell.itemNo.text = cellProduct.itemNo;
                     orderSummCell.orderId = indexPath.row - 1;
                     orderSummCell.state = cellProduct.state;
+                    orderSummCell.itemPic.userInteractionEnabled = YES;
+                    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:orderSummCell action:@selector(imageTapped:)];
+                    [orderSummCell.itemPic addGestureRecognizer:tap];
+                    
                     if (orderSummCell.state == 1) {
                         orderSummCell.backgroundColor = [UIColor greenColor];
+                        orderSummCell.itemPic.userInteractionEnabled = NO;
                         orderSummCell.upButton.userInteractionEnabled = NO;
                         orderSummCell.downButton.userInteractionEnabled = NO;
                     } else {
                         orderSummCell.backgroundColor = [UIColor colorWithRed:0.97f green:0.97f blue:0.97f alpha:1];
                         orderSummCell.upButton.userInteractionEnabled = YES;
                         orderSummCell.downButton.userInteractionEnabled = YES;
+                        orderSummCell.itemPic.userInteractionEnabled = YES;
                     }
                     return orderSummCell;
                 }
@@ -627,12 +646,14 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
             tempCell.state ^= 1;
             if (tempCell.state == 1) {
                 tempCell.backgroundColor = [UIColor greenColor];
+                tempCell.itemPic.userInteractionEnabled = NO;
                 tempCell.upButton.userInteractionEnabled = NO;
                 tempCell.downButton.userInteractionEnabled = NO;
             } else {
                 tempCell.backgroundColor = [UIColor colorWithRed:0.97f green:0.97f blue:0.97f alpha:1];
                 tempCell.upButton.userInteractionEnabled = YES;
                 tempCell.downButton.userInteractionEnabled = YES;
+                tempCell.itemPic.userInteractionEnabled = YES;
             }
             [tempCell.delegate orderStateChanged:indexPath.row-1 withNewValue:tempCell.state];
             [self checkOrderCollectedButtonState];

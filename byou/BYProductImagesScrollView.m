@@ -24,12 +24,35 @@
     return self;
 }
 
--(void)addProductsToView:(NSMutableArray *)dProducts {
+-(void)createListView:(NSMutableArray *)dProducts {
     self.products = [NSMutableArray arrayWithArray:dProducts];
+    self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /2) * 300) + 100);
+    [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+        int leftPos = (idx % 2) ? 428 : 89;
+        int topPos = 100 + ((int)roundf(idx / 2) * 300);
+        NSString* str = [[NSString stringWithFormat:@"%@.jpg",obj.imageURL]
+                         stringByReplacingOccurrencesOfString:@"origs"
+                         withString:@"thumbs"];
+        NSURL *url = [NSURL URLWithString:str];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        UIImage *image = [UIImage imageWithData:data];
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(leftPos,topPos,250.0f,250.0f)];
+        imageView.image = image;
+        imageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self.delegate action:@selector(showProductView:)];
+        [imageView addGestureRecognizer:tap];
+        imageView.tag = idx;
+        [self addSubview:imageView];
+    }];
+    NSLog(@"%d",(int)ceilf([dProducts count] /2) * 2000);
+}
+
+-(void)addProductsToView:(int)startPos {
     //CGRect bounds = [[UIScreen mainScreen] bounds];
     __block int iPos = 0;
     [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
-        NSURL *url = [NSURL URLWithString:obj.imageURL];
+        NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
+        NSURL *url = [NSURL URLWithString:str];
         NSData *data = [NSData dataWithContentsOfURL:url];
         UIImage *image = [UIImage imageWithData:data];
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
@@ -39,7 +62,10 @@
         iPos += self.bounds.size.width;
     }];
     self.contentSize = CGSizeMake(iPos,self.bounds.size.height - 56.0f);
+    CGPoint scrollPoint = CGPointMake( 0 + (self.bounds.size.width * startPos), 0.0f);
+    [self setContentOffset:scrollPoint animated:YES];
 }
+
 
 /*
 // Only override drawRect: if you perform custom drawing.

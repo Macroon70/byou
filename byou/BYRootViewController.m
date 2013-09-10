@@ -202,11 +202,11 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
         self.scrollView.delegate = self;
         self.back_button.hidden = NO;
         self.CategoryCont.hidden = NO;
-        self.itemInfoCont.hidden = NO;
+        //self.itemInfoCont.hidden = NO;
         self.CategoryName.text = menuName;
-        if ([self.Products.basket count] > 0)[self.Products getBasketInfoFromDict:menuName];
         [self setStockInfoLabel:0];
-        [self.scrollView addProductsToView:self.Products.products];
+        [self.scrollView createListView:self.Products.products];
+        //[self.scrollView addProductsToView:self.Products.products];
         [self.view insertSubview:self.scrollView belowSubview:self.CategoryCont];
     }
     [menuAct stopAnimating];
@@ -264,6 +264,18 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     int pageNum = (int)(self.scrollView.contentOffset.x / self.scrollView.frame.size.width);
     [self setStockInfoLabel:pageNum];
 }
+
+-(void)showProductView:(UIGestureRecognizer*)gestureRecognizer {
+    self.back_button.hidden = NO;
+    self.CategoryCont.hidden = NO;
+    self.itemInfoCont.hidden = NO;
+    self.CategoryName.text = menuName;
+    if ([self.Products.basket count] > 0)[self.Products getBasketInfoFromDict:menuName];
+    [self setStockInfoLabel:gestureRecognizer.view.tag];
+    [self.scrollView addProductsToView:gestureRecognizer.view.tag];
+}
+
+
 
 #pragma mark - TableView DataSource Methods
 

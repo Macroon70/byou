@@ -506,15 +506,18 @@
                                     <outlet property="delegate" destination="dKN-ou-1iX" id="bek-ck-cOq"/>
                                 </connections>
                             </tableView>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pbW-2x-HAa">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pbW-2x-HAa">
                                 <constraints>
                                     <constraint firstAttribute="width" constant="118" id="QMj-lH-Awr"/>
                                     <constraint firstAttribute="height" constant="60" id="lEU-st-WgA"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Helvetica-Bold" family="Helvetica" pointSize="18"/>
+                                <fontDescription key="fontDescription" type="boldSystem" size="button"/>
                                 <state key="normal" title="Vissza" backgroundImage="back_button.png">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="back_pushed:" destination="dKN-ou-1iX" eventType="touchUpInside" id="L7Q-6v-Xyu"/>
@@ -726,6 +729,7 @@
                         <outlet property="basketInfo" destination="fcJ-fm-GRH" id="FbG-2V-nDU"/>
                         <outlet property="itemBigPic" destination="vpc-m2-b6T" id="KQT-FH-h4G"/>
                         <outlet property="itemInfoCont" destination="Cph-ra-vEt" id="Dax-HF-dIR"/>
+                        <outlet property="mainLabel" destination="nn2-Vy-0jl" id="KfI-Ga-aJd"/>
                         <outlet property="refreshButton" destination="QTQ-Dv-NyK" id="JIx-v0-lye"/>
                         <outlet property="statusLabel" destination="arj-k6-sZC" id="OST-aR-uez"/>
                         <outlet property="stockInfo" destination="vPX-y9-T3Y" id="7AB-4G-R3T"/>
@@ -804,6 +808,7 @@
                 <relationship kind="outlet" name="basketInfo" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="itemBigPic" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="itemInfoCont" candidateClass="UIView"/>
+                <relationship kind="outlet" name="mainLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="refreshButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="statusLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="stockInfo" candidateClass="UILabel"/>

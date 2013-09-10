@@ -22,6 +22,7 @@
 
 @property (nonatomic, strong) NSMutableArray* actualPieces;
 @property (weak, nonatomic) IBOutlet UIImageView *itemBigPic;
+@property (weak, nonatomic) IBOutlet UILabel *mainLabel;
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 #pragma mark -

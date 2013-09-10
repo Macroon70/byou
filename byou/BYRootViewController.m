@@ -76,6 +76,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     [self setBasketInfo:nil];
     [self setItemInfoCont:nil];
     [self setRefreshButton:nil];
+    [self setMainLabel:nil];
     [super viewDidUnload];
 }
 
@@ -119,12 +120,13 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
         
     } else {
         self.back_button.hidden = YES;
-        self.CategoryCont.hidden = YES;
+        //self.CategoryCont.hidden = YES;
         self.itemInfoCont.hidden = YES;
         self.refreshButton.hidden = NO;
         [self.Products sendBasketInfoToDict:menuName];
         [self.Products refreshMenu];
         [self.scrollView removeFromSuperview];
+        self.mainLabel.text = @"byouWarehouse";
     }
 }
 
@@ -207,8 +209,9 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
         self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 56.0f, self.view.bounds.size.width, self.view.bounds.size.height - 56.0f)];
         self.scrollView.delegate = self;
         self.back_button.hidden = NO;
-        self.CategoryCont.hidden = NO;
+        //self.CategoryCont.hidden = NO;
         //self.itemInfoCont.hidden = NO;
+        self.mainLabel.text = menuName;
         self.CategoryName.text = menuName;
         [self setStockInfoLabel:0];
         [self.scrollView createListView:self.Products.products];
@@ -274,8 +277,9 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 
 -(void)showProductView:(UIGestureRecognizer*)gestureRecognizer {
     self.back_button.hidden = NO;
-    self.CategoryCont.hidden = NO;
+    //self.CategoryCont.hidden = NO;
     self.itemInfoCont.hidden = NO;
+    self.mainLabel.text = menuName;
     self.CategoryName.text = menuName;
     if ([self.Products.basket count] > 0)[self.Products getBasketInfoFromDict:menuName];
     [self setStockInfoLabel:gestureRecognizer.view.tag-1];

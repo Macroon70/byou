@@ -33,11 +33,11 @@
         NSString* str = [[NSString stringWithFormat:@"%@.jpg",obj.imageURL]
                          stringByReplacingOccurrencesOfString:@"origs"
                          withString:@"thumbs"];
-        NSURL *url = [NSURL URLWithString:str];
-        NSData *data = [NSData dataWithContentsOfURL:url];
-        UIImage *image = [UIImage imageWithData:data];
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(leftPos,topPos,250.0f,250.0f)];
-        imageView.image = image;
+        NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+        __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(leftPos,topPos,250.0f,250.0f)];
+        [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            imageView.image = [UIImage imageWithData:data];
+        }];
         imageView.userInteractionEnabled = YES;
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self.delegate action:@selector(showProductView:)];
         [imageView addGestureRecognizer:tap];
@@ -52,11 +52,12 @@
     __block int iPos = 0;
     [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
         NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
-        NSURL *url = [NSURL URLWithString:str];
-        NSData *data = [NSData dataWithContentsOfURL:url];
-        UIImage *image = [UIImage imageWithData:data];
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
-        imageView.image = image;
+        NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+        __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
+        imageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"loading" ofType:@"png"]];
+        [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            imageView.image = [UIImage imageWithData:data];
+        }];
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:imageView];
         iPos += self.bounds.size.width;

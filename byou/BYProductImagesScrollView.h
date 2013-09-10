@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BYProductImagesScrollView : UIScrollView
+@interface BYProductImagesScrollView : UIScrollView <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 -(void)addProductsToView:(int)startPos;
 -(void)createListView:(NSMutableArray*)dProducts;

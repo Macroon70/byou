@@ -113,13 +113,17 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 #pragma mark - self delegates
 
 -(IBAction)back_pushed:(id)sender {
-    self.back_button.hidden = YES;
-    self.CategoryCont.hidden = YES;
-    self.itemInfoCont.hidden = YES;
-    self.refreshButton.hidden = NO;
-    [self.Products sendBasketInfoToDict:menuName];
-    [self.Products refreshMenu];
-    [self.scrollView removeFromSuperview];
+    if (self.scrollView.inImgView) {
+        [self.scrollView createListView:[NSMutableArray array]];
+    } else {
+        self.back_button.hidden = YES;
+        self.CategoryCont.hidden = YES;
+        self.itemInfoCont.hidden = YES;
+        self.refreshButton.hidden = NO;
+        [self.Products sendBasketInfoToDict:menuName];
+        [self.Products refreshMenu];
+        [self.scrollView removeFromSuperview];
+    }
 }
 
 - (IBAction)refreshPushed:(id)sender {
@@ -238,7 +242,8 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 }
 
 -(void)showImageInBig:(NSString *)imgURL {
-    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgURL]];
+    NSString* str = [NSString stringWithFormat:@"%@.jpg",imgURL];
+    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:str]];
     self.itemBigPic.image = [[UIImage alloc] initWithData:imageData];
     self.itemBigPic.hidden = NO;
 }
@@ -271,8 +276,8 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     self.itemInfoCont.hidden = NO;
     self.CategoryName.text = menuName;
     if ([self.Products.basket count] > 0)[self.Products getBasketInfoFromDict:menuName];
-    [self setStockInfoLabel:gestureRecognizer.view.tag];
-    [self.scrollView addProductsToView:gestureRecognizer.view.tag];
+    [self setStockInfoLabel:gestureRecognizer.view.tag-1];
+    [self.scrollView addProductsToView:gestureRecognizer.view.tag-1];
 }
 
 
@@ -449,8 +454,13 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                     cell.delegate = self;
                     BYProduct *cellProduct = [self.Products.basket objectForKey:[self.Products.allBasketKeys objectAtIndex:indexPath.row-1]];
                     cell.itemName.text = cellProduct.CategoryName;
-                    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:cellProduct.imageURL]];
-                    cell.itemPic.image = [UIImage imageWithData:imageData];
+                    NSString* str = [[NSString stringWithFormat:@"%@_small.jpg",cellProduct.imageURL]
+                                     stringByReplacingOccurrencesOfString:@"origs"
+                                     withString:@"thumbs"];
+                    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+                    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                        cell.itemPic.image = [UIImage imageWithData:data];
+                    }];
                     cell.itemPieces.text = [NSString stringWithFormat:@"%d db",cellProduct.basket];
                     cell.itemNum = cellProduct.basket;
                     cell.maxItemNum = cellProduct.pieces + cellProduct.basket;
@@ -516,9 +526,14 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                     orderSummCell.delegate = self;
                     BYOrder *cellProduct = (BYOrder*)[self.Products.actualOrderItems objectAtIndex:indexPath.row -1];
                     orderSummCell.itemName.text = cellProduct.itemCategory;
-                    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:cellProduct.itemImg]];
+                    NSString* str = [[NSString stringWithFormat:@"%@_small.jpg",cellProduct.itemImg]
+                                     stringByReplacingOccurrencesOfString:@"origs"
+                                     withString:@"thumbs"];
+                    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+                    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                        orderSummCell.itemPic.image = [UIImage imageWithData:data];
+                    }];
                     orderSummCell.imgURL = cellProduct.itemImg;
-                    orderSummCell.itemPic.image = [UIImage imageWithData:imageData];
                     orderSummCell.itemPieces.text = [NSString stringWithFormat:@"%d db",cellProduct.itemQuantity];
                     orderSummCell.itemPiecesChecked.text = [NSString stringWithFormat:@"%d db",cellProduct.itemQuantityRel];
                     orderSummCell.oriValue = cellProduct.itemQuantity;

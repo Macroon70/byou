@@ -14,5 +14,6 @@
 -(void)createListView:(NSMutableArray*)dProducts;
 
 @property (nonatomic, retain) NSMutableArray* products;
+@property BOOL inImgView;
 
 @end

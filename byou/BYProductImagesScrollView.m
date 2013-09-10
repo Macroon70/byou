@@ -9,9 +9,15 @@
 #import "BYProductImagesScrollView.h"
 #import "BYProduct.h"
 
-@implementation BYProductImagesScrollView
+@implementation BYProductImagesScrollView {
+    BOOL thumbsLoaded;
+    BOOL imgLoaded;
+    CGSize thumbView;
+    CGSize imgView;
+}
 
 @synthesize products;
+@synthesize inImgView;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -20,51 +26,99 @@
         self.backgroundColor = [UIColor blackColor];
         self.pagingEnabled = YES;
         self.showsHorizontalScrollIndicator = NO;
+        thumbsLoaded = NO;
+        imgLoaded = NO;
+        self.inImgView = NO;
     }
     return self;
 }
 
 -(void)createListView:(NSMutableArray *)dProducts {
-    self.products = [NSMutableArray arrayWithArray:dProducts];
-    self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /2) * 300) + 100);
-    [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
-        int leftPos = (idx % 2) ? 428 : 89;
-        int topPos = 100 + ((int)roundf(idx / 2) * 300);
-        NSString* str = [[NSString stringWithFormat:@"%@.jpg",obj.imageURL]
-                         stringByReplacingOccurrencesOfString:@"origs"
-                         withString:@"thumbs"];
-        NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
-        __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(leftPos,topPos,250.0f,250.0f)];
-        [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-            imageView.image = [UIImage imageWithData:data];
+    if (!thumbsLoaded) {
+        self.products = [NSMutableArray arrayWithArray:dProducts];
+        self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /4) * 192) + 100);
+        thumbView = self.contentSize;
+        [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+            int leftPos = (idx % 2) ? 428 : 89;
+            switch (idx % 4) {
+                case 0:
+                    leftPos = 1;
+                    break;
+                case 1:
+                    leftPos = 193;
+                    break;
+                case 2:
+                    leftPos = 385;
+                    break;
+                case 3:
+                    leftPos = 577;
+                    break;
+                default:
+                    break;
+            }
+            int topPos = 100 + ((int)roundf(idx / 4) * 192);
+            NSString* str = [[NSString stringWithFormat:@"%@.jpg",obj.imageURL]
+                             stringByReplacingOccurrencesOfString:@"origs"
+                             withString:@"thumbs"];
+            NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+            __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(leftPos,topPos,190.0f,190.0f)];
+            [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                imageView.image = [UIImage imageWithData:data];
+            }];
+            imageView.userInteractionEnabled = YES;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self.delegate action:@selector(showProductView:)];
+            [imageView addGestureRecognizer:tap];
+            imageView.tag = idx + 1;
+            [self addSubview:imageView];
+            thumbsLoaded = YES;
         }];
-        imageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self.delegate action:@selector(showProductView:)];
-        [imageView addGestureRecognizer:tap];
-        imageView.tag = idx;
-        [self addSubview:imageView];
-    }];
-    NSLog(@"%d",(int)ceilf([dProducts count] /2) * 2000);
+    } else {
+        for (UIImageView* view in self.subviews) {
+            if (view.tag != 0) {
+                view.hidden = NO;
+                self.contentSize = thumbView;
+            } else view.hidden = YES;
+        }
+    }
+    self.inImgView = NO;
 }
 
 -(void)addProductsToView:(int)startPos {
     //CGRect bounds = [[UIScreen mainScreen] bounds];
     __block int iPos = 0;
-    [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
-        NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
-        NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
-        __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
-        imageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"loading" ofType:@"png"]];
-        [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-            imageView.image = [UIImage imageWithData:data];
+    for (UIImageView* view in self.subviews) {
+        if (view.tag != 0) {
+            view.hidden = YES;
+        }
+    }
+    if (!imgLoaded) {
+        [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
+            NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
+            NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+            __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
+            imageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"loading" ofType:@"png"]];
+            [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                imageView.image = [UIImage imageWithData:data];
+            }];
+            imageView.contentMode = UIViewContentModeScaleAspectFit;
+            [self addSubview:imageView];
+            iPos += self.bounds.size.width;
         }];
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self addSubview:imageView];
-        iPos += self.bounds.size.width;
-    }];
-    self.contentSize = CGSizeMake(iPos,self.bounds.size.height - 56.0f);
-    CGPoint scrollPoint = CGPointMake( 0 + (self.bounds.size.width * startPos), 0.0f);
+        self.contentSize = CGSizeMake(iPos,self.bounds.size.height - 56.0f);
+        imgView = self.contentSize;
+        imgLoaded = YES;
+    } else {
+        for (UIImageView* view in self.subviews) {
+            if (view.tag == 0) {
+                view.hidden = NO;
+                self.contentSize = imgView;
+            }
+        }
+    }
+    CGPoint scrollPoint = CGPointMake( 0 + (self.bounds.size.width * (startPos)), 0.0f);
     [self setContentOffset:scrollPoint animated:YES];
+    self.inImgView = YES;
+
 }
 
 

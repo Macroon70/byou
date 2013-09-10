@@ -116,7 +116,7 @@
         }
     }
     CGPoint scrollPoint = CGPointMake( 0 + (self.bounds.size.width * (startPos)), 0.0f);
-    [self setContentOffset:scrollPoint animated:YES];
+    [self setContentOffset:scrollPoint animated:NO];
     self.inImgView = YES;
 
 }

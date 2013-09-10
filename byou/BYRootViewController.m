@@ -115,6 +115,8 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 -(IBAction)back_pushed:(id)sender {
     if (self.scrollView.inImgView) {
         [self.scrollView createListView:[NSMutableArray array]];
+        self.itemInfoCont.hidden = YES;
+        
     } else {
         self.back_button.hidden = YES;
         self.CategoryCont.hidden = YES;

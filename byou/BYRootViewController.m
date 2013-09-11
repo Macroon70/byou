@@ -206,7 +206,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 
 -(void)collectionDidFinish {
     if ([self.Products.products count] != 0) {
-        self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 56.0f, self.view.bounds.size.width, self.view.bounds.size.height - 56.0f)];
+        self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 76.0f, self.view.bounds.size.width, self.view.bounds.size.height - 76.0f)];
         self.scrollView.delegate = self;
         self.back_button.hidden = NO;
         //self.CategoryCont.hidden = NO;

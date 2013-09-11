@@ -36,7 +36,7 @@
 -(void)createListView:(NSMutableArray *)dProducts {
     if (!thumbsLoaded) {
         self.products = [NSMutableArray arrayWithArray:dProducts];
-        self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /4) * 192) + 100);
+        self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /4) * 192) + 70);
         thumbView = self.contentSize;
         [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
             int leftPos = (idx % 2) ? 428 : 89;
@@ -56,7 +56,7 @@
                 default:
                     break;
             }
-            int topPos = 100 + ((int)roundf(idx / 4) * 192);
+            int topPos = 70 + ((int)roundf(idx / 4) * 192);
             NSString* str = [[NSString stringWithFormat:@"%@.jpg",obj.imageURL]
                              stringByReplacingOccurrencesOfString:@"origs"
                              withString:@"thumbs"];

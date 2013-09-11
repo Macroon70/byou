@@ -247,9 +247,19 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 }
 
 -(void)showImageInBig:(NSString *)imgURL {
-    NSString* str = [NSString stringWithFormat:@"%@.jpg",imgURL];
-    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:str]];
-    self.itemBigPic.image = [[UIImage alloc] initWithData:imageData];
+    for (UIImageView* imgV in self.itemBigPic.subviews) {
+        [imgV removeFromSuperview];
+    }
+    NSString* str = [[NSString stringWithFormat:@"%@.jpg",imgURL] stringByReplacingOccurrencesOfString:@"thumbs"
+                                                                                            withString:@"origs"];
+
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        self.itemBigPic.image = [UIImage imageWithData:data];
+    }];
+    
+    //NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:str]];
+    //self.itemBigPic.image = [[UIImage alloc] initWithData:imageData];
     self.itemBigPic.hidden = NO;
 }
 

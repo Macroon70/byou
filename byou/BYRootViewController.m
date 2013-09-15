@@ -57,7 +57,9 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeBigPic:)];
     [self.itemBigPic addGestureRecognizer:tap];
     self.zoomView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, self.view.bounds.size.height);
     self.zoomView.minimumZoomScale = 1.0;
+    self.zoomView.zoomScale = 1.0;
     self.zoomView.maximumZoomScale = 6.0;
     self.zoomView.tag = 1;
     self.zoomView.delegate = self;
@@ -66,8 +68,6 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     UITapGestureRecognizer *zTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeZoomView:)];
     [self.zoomView addGestureRecognizer:zTap];
 }
-
-
 
 - (void)didReceiveMemoryWarning
 {
@@ -203,6 +203,8 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 }
 
 -(void)closeZoomView:(UITapGestureRecognizer*)gestureRecognizer {
+    [scrollViewImage removeFromSuperview];
+    self.zoomView.zoomScale = 1.0;
     [self.zoomView removeFromSuperview];
 }
 
@@ -313,7 +315,6 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
 }
 
 -(void)startZooming:(UIImageView *)imageContent {
-    NSLog(@"%@",imageContent);
     for (UIImageView* view in self.scrollView.subviews) {
         if (view.tag == (imageContent.tag / 500)) {
             BYProduct *tempProduct = [self.scrollView.products objectAtIndex:((imageContent.tag / 500)*-1)-1];
@@ -324,7 +325,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
                 imageView.image = [UIImage imageWithData:data];
             }];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
-            
+            scrollViewImage.center = self.scrollView.center;
             scrollViewImage = imageView;
             [self.zoomView addSubview:imageView];
             [self.view addSubview:self.zoomView];

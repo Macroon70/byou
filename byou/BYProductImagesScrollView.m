@@ -74,7 +74,7 @@
         }];
     } else {
         for (UIImageView* view in self.subviews) {
-            if (view.tag != 0) {
+            if (view.tag > 0) {
                 view.hidden = NO;
                 self.contentSize = thumbView;
             } else view.hidden = YES;
@@ -96,20 +96,28 @@
             NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
             __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
+            __block UIImageView *sImageView = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 80, 10, 70, 90)];
+            sImageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"search" ofType:@"png"]];
+            sImageView.userInteractionEnabled = YES;
+            UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoomTapped:)];
+            [sImageView addGestureRecognizer:tap];
             imageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"loading" ofType:@"png"]];
             [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
                 imageView.image = [UIImage imageWithData:data];
             }];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
+            imageView.tag = (idx + 1)*-1;
             [self addSubview:imageView];
             iPos += self.bounds.size.width;
+            sImageView.tag = imageView.tag * 500;
+            [self addSubview:sImageView];
         }];
         self.contentSize = CGSizeMake(iPos,self.bounds.size.height - 56.0f);
         imgView = self.contentSize;
         imgLoaded = YES;
     } else {
         for (UIImageView* view in self.subviews) {
-            if (view.tag == 0) {
+            if (view.tag < 0) {
                 view.hidden = NO;
                 self.contentSize = imgView;
             }
@@ -121,6 +129,9 @@
 
 }
 
+-(void)zoomTapped:(UIGestureRecognizer*)recognizer {
+    [self.sDelegate startZooming:(UIImageView*)recognizer.view];
+}
 
 /*
 // Only override drawRect: if you perform custom drawing.

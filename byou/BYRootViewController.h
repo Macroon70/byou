@@ -14,7 +14,7 @@
 #import "BYCellPrototypeBasket.h"
 
 @interface BYRootViewController : UIViewController
-    <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, ByCellPrototypeOrderDelegate, ByCellPrototypeBasketDelegate, UITextFieldDelegate>
+    <BYProductFactoryDelegate, UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, ByCellPrototypeOrderDelegate, ByCellPrototypeBasketDelegate, UITextFieldDelegate, BYProductImageScrollViewDelegate>
 
 @property (nonatomic, strong) BYProductFactory* Products;
 
@@ -28,6 +28,7 @@
 #pragma mark -
 #pragma mark ViewControllers
 @property (weak, nonatomic) IBOutlet UITableView *tableViewCont;
+@property (strong, nonatomic) UIScrollView* zoomView;
 
 #pragma mark -
 #pragma mark Outlets

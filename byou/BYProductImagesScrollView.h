@@ -8,10 +8,21 @@
 
 #import <UIKit/UIKit.h>
 
+@class BYProductImagesScrollView;
+
+@protocol BYProductImageScrollViewDelegate
+
+-(void)startZooming:(UIImageView*)imageContent;
+
+@end
+
+
 @interface BYProductImagesScrollView : UIScrollView <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 -(void)addProductsToView:(int)startPos;
 -(void)createListView:(NSMutableArray*)dProducts;
+
+@property (nonatomic, weak) id<BYProductImageScrollViewDelegate> sDelegate;
 
 @property (nonatomic, retain) NSMutableArray* products;
 @property BOOL inImgView;

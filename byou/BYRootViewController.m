@@ -34,12 +34,14 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     NSTimer* repeatTimer;
     int isPlaceOrder;
     BOOL orderCellState;
+    UIImageView* scrollViewImage;
 }
 
 @synthesize Products;
 @synthesize scrollView;
 @synthesize actualPieces;
 @synthesize tableViewCont;
+@synthesize zoomView;
 
 @synthesize userName;
 
@@ -54,6 +56,15 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     isPlaceOrder = 0;
     UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeBigPic:)];
     [self.itemBigPic addGestureRecognizer:tap];
+    self.zoomView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    self.zoomView.minimumZoomScale = 1.0;
+    self.zoomView.maximumZoomScale = 6.0;
+    self.zoomView.tag = 1;
+    self.zoomView.delegate = self;
+    self.zoomView.userInteractionEnabled = YES;
+    self.zoomView.backgroundColor = [UIColor blackColor];
+    UITapGestureRecognizer *zTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeZoomView:)];
+    [self.zoomView addGestureRecognizer:zTap];
 }
 
 
@@ -191,6 +202,10 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     gestureRecognizer.view.hidden = YES;
 }
 
+-(void)closeZoomView:(UITapGestureRecognizer*)gestureRecognizer {
+    [self.zoomView removeFromSuperview];
+}
+
 #pragma mark - Factory Delegates
 
 -(void)loginDidFinish {
@@ -208,6 +223,7 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     if ([self.Products.products count] != 0) {
         self.scrollView = [[BYProductImagesScrollView alloc] initWithFrame:CGRectMake(0.0f, 76.0f, self.view.bounds.size.width, self.view.bounds.size.height - 76.0f)];
         self.scrollView.delegate = self;
+        self.scrollView.sDelegate = self;
         self.back_button.hidden = NO;
         //self.CategoryCont.hidden = NO;
         //self.itemInfoCont.hidden = NO;
@@ -296,6 +312,32 @@ NSString*(^thousandSeparate)(int) = ^(int number) {
     [self.scrollView addProductsToView:gestureRecognizer.view.tag-1];
 }
 
+-(void)startZooming:(UIImageView *)imageContent {
+    NSLog(@"%@",imageContent);
+    for (UIImageView* view in self.scrollView.subviews) {
+        if (view.tag == (imageContent.tag / 500)) {
+            BYProduct *tempProduct = [self.scrollView.products objectAtIndex:((imageContent.tag / 500)*-1)-1];
+            NSString* str = [NSString stringWithFormat:@"%@.jpg",tempProduct.imageURL];
+            NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+            __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height)];
+            [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                imageView.image = [UIImage imageWithData:data];
+            }];
+            imageView.contentMode = UIViewContentModeScaleAspectFit;
+            
+            scrollViewImage = imageView;
+            [self.zoomView addSubview:imageView];
+            [self.view addSubview:self.zoomView];
+        }
+    }
+}
+
+-(UIView*)viewForZoomingInScrollView:(UIScrollView *)sView {
+    if (sView.tag == 1) {
+        return scrollViewImage;
+    }
+    return nil;
+}
 
 
 #pragma mark - TableView DataSource Methods

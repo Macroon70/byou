@@ -96,7 +96,7 @@
             NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
             __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
-            __block UIImageView *sImageView = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 80, 10, 70, 90)];
+            __block UIImageView *sImageView = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 80+iPos, 10, 70, 90)];
             sImageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"search" ofType:@"png"]];
             sImageView.userInteractionEnabled = YES;
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoomTapped:)];

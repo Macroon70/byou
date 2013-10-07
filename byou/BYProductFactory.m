@@ -270,6 +270,8 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     NSURL *initURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@.php",REQUEST_URL,phpFileName]];
     NSString *post =[NSString stringWithFormat:@"%@=%@",postName,postValue];
     
+    NSLog(@"%@",post);
+    
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     
@@ -279,10 +281,10 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:postData];
-    [request setTimeoutInterval:10.0f];
+    [request setTimeoutInterval:40.0f];
     
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    
+    NSLog(@"%@",connection);
     return connection;
     
 }
@@ -296,7 +298,8 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
 -(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     NSDictionary* headers = [httpResponse allHeaderFields];
-    if ([headers objectForKey:@"Content-Length"] > 0 && [[headers objectForKey:@"Content-Type"] hasPrefix:@"text/xml"]) {
+    NSLog(@"%@",headers);
+    if ([[headers objectForKey:@"Content-Type"] hasPrefix:@"text/xml"]) {
         NSLog(@"%@",headers);
         receivedData.length = 0;
         if ([[headers objectForKey:@"Content-Length"] intValue] == 37 && [URLMethod isEqualToString:@"Login"]) {
@@ -305,17 +308,26 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
             [self.delegate loginDidFinish];
         }
     } else {
+        NSLog(@"itt");
         [connection cancel];
     }
 }
 
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     [receivedData appendData:data];
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
-    [parser setDelegate:self];
-    [parser setShouldReportNamespacePrefixes:YES];
-    [parser setShouldResolveExternalEntities:YES];
-    [parser parse];
+}
+
+-(void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    if ([receivedData length] > 0) {
+        NSLog(@"%@",[[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding]);
+        NSLog(@"%d",[receivedData length]);
+    
+        NSXMLParser *parser = [[NSXMLParser alloc] initWithData:receivedData];
+        [parser setDelegate:self];
+        [parser setShouldReportNamespacePrefixes:YES];
+        [parser setShouldResolveExternalEntities:YES];
+        [parser parse];
+    }
 }
 
 #pragma mark - XMLParser delegates
@@ -356,7 +368,7 @@ NSString*(^thousandSeparate3)(int) = ^(int number) {
         BYProduct* tempProduct = [[BYProduct alloc] init];
         tempProduct.CategoryName = actualName;
         tempProduct.pieces = [[attributeDict objectForKey:@"DB"] intValue];
-        tempProduct.imageURL = [NSString stringWithFormat:@"%@/%@",imagesBaseHref,[attributeDict objectForKey:@"SRC"]];
+        tempProduct.imageURL = [NSMutableString stringWithFormat:@"%@/%@",imagesBaseHref,[attributeDict objectForKey:@"SRC"]];
         tempProduct.ID = [[attributeDict objectForKey:@"ITEMID"] intValue];
         if ([[attributeDict objectForKey:@"PRICE"] length] != 0) {
             tempProduct.itemPrice = [[attributeDict objectForKey:@"PRICE"] intValue];

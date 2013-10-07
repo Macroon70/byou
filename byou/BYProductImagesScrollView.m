@@ -36,7 +36,7 @@
 -(void)createListView:(NSMutableArray *)dProducts {
     if (!thumbsLoaded) {
         self.products = [NSMutableArray arrayWithArray:dProducts];
-        self.contentSize = CGSizeMake(self.bounds.size.width,((int)ceilf([dProducts count] /4) * 192) + 70);
+        self.contentSize = CGSizeMake(self.bounds.size.width,(((int)ceilf([dProducts count]+4) /4) * 192) + 100);
         thumbView = self.contentSize;
         [self.products enumerateObjectsUsingBlock:^(BYProduct* obj, NSUInteger idx, BOOL *stop) {
             int leftPos = (idx % 2) ? 428 : 89;
@@ -96,11 +96,7 @@
             NSString* str = [NSString stringWithFormat:@"%@.jpg",obj.imageURL];
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
             __block UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0+iPos,0,self.bounds.size.width,self.bounds.size.height)];
-<<<<<<< HEAD
             __block UIImageView *sImageView = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 80 + iPos, 10, 70, 90)];
-=======
-            __block UIImageView *sImageView = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 80+iPos, 10, 70, 90)];
->>>>>>> e2bb49569277ccbe76a1f63c1448e42076957c1b
             sImageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"search" ofType:@"png"]];
             sImageView.userInteractionEnabled = YES;
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoomTapped:)];
